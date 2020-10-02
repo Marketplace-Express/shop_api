@@ -1,0 +1,26 @@
+version: '3.3'
+services:
+  api-interface:
+    image: 'registry.gitlab.com/shop_ecommerce/shop_api'
+    command: php -S 0.0.0.0:8000 -t public/
+    volumes:
+      - .:/src
+      - /src/vendor
+    ports:
+      - "1004:8000"
+    environment:
+      - PHP_IDE_CONFIG=serverName=docker
+
+  api-unit-test:
+    image: 'registry.gitlab.com/shop_ecommerce/shop_api'
+    command: vendor/bin/phpunit --bootstrap tests/bootstrap.php --configuration tests/phpunit.xml
+    environment:
+      - APP_ENV=test
+    volumes:
+      - .:/src
+      - /src/vendor
+
+networks:
+  default:
+    external:
+      name: marketplace-network

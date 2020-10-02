@@ -1,0 +1,57 @@
+{
+    "name": "shop/shop_api",
+    "description": "Shop API Service",
+    "keywords": [
+
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Wajdi Jurry",
+            "email": "jurrywajdi@yahoo.com",
+            "homepage": "http://www.mobarmej.net/"
+        }
+    ],
+    "require": {
+        "php": "^7.2.5",
+        "ext-json": "*",
+        "ext-redis": "*",
+        "akrabat/ip-address-middleware": "^1.0",
+        "doctrine/annotations": "^1.10",
+        "ethanhann/redisearch-php": "^1.3",
+        "firebase/php-jwt": "^5.2",
+        "monolog/monolog": "^2.1",
+        "php-amqplib/php-amqplib": "^2.12",
+        "php-di/php-di": "^6.2",
+        "slim/psr7": "^1.1",
+        "slim/slim": "^4.5",
+        "vlucas/phpdotenv": "^5.2"
+    },
+    "require-dev": {
+        "jangregor/phpstan-prophecy": "^0.8.0",
+        "phpstan/extension-installer": "^1.0.4",
+        "phpstan/phpstan": "^0.12.37",
+        "phpunit/phpunit": "^7.3"
+    },
+    "config": {
+        "process-timeout": 0,
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "start": "php -S localhost:8080 -t public",
+        "test": "phpunit",
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ]
+    }
+}
