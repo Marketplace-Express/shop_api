@@ -12,6 +12,10 @@ abstract class AbstractHandler implements HandlerInterface
 {
     private $next;
 
+    /**
+     * @param AbstractHandler $handler
+     * @return AbstractHandler
+     */
     public function next(AbstractHandler $handler): AbstractHandler
     {
         $this->next = $handler;
@@ -19,6 +23,9 @@ abstract class AbstractHandler implements HandlerInterface
         return $handler;
     }
 
+    /**
+     * @return array|mixed
+     */
     public function handle()
     {
         $args = func_get_args();

@@ -64,11 +64,6 @@ class ThrottleService
         $this->connector->redis->expire($key, $ttl);
     }
 
-    private function get(string $ip)
-    {
-        return $this->connector->redis->get($this->keyBuilder($ip));
-    }
-
     /**
      * @param string $ip
      * @param string $action
@@ -76,6 +71,10 @@ class ThrottleService
      */
     public function checkThrottle(string $ip, string $action): bool
     {
+        if (empty($action)) {
+            return true;
+        }
+
         [$lastActivity, $tries] = $this->getThrottleValue($ip, $action);
         $triesPerHour = $this->throttleSettings[$action][3600];
         $triesPerDay = $this->throttleSettings[$action][86400];
