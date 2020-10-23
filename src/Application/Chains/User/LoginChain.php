@@ -5,20 +5,17 @@
  * Time: 01:08
  */
 
-namespace App\Application\Chains;
+namespace App\Application\Chains\User;
 
 
-use App\Application\Handlers\AbstractHandler;
-use App\Application\Handlers\Register;
+use App\Application\Chains\AbstractChain;
+use App\Application\Handlers\User\Login;
 use App\Application\Handlers\Logger;
 use App\Utilities\RequestSenderInterface;
 use Psr\Log\LoggerInterface;
 
-class RegisterChain
+class LoginChain extends AbstractChain
 {
-    /** @var AbstractHandler */
-    private $chain;
-
     /**
      * @var RequestSenderInterface
      */
@@ -29,6 +26,11 @@ class RegisterChain
      */
     private $logger;
 
+    /**
+     * LoginChain constructor.
+     * @param RequestSenderInterface $requestSender
+     * @param LoggerInterface $logger
+     */
     public function __construct(RequestSenderInterface $requestSender, LoggerInterface $logger)
     {
         $this->requestSender = $requestSender;
@@ -40,20 +42,11 @@ class RegisterChain
      */
     public function initiate()
     {
-        $handler = new Register($this->requestSender);
-        $handler->next(new Logger($this->logger, "New user registered"));
+        $handlers = new Login($this->requestSender);
+        $handlers->next(new Logger($this->logger, "New user login"));
 
-        $this->chain = $handler;
+        $this->handlers = $handlers;
 
         return $this;
-    }
-
-    /**
-     * @param array $data
-     * @return array|mixed
-     */
-    public function run(array $data)
-    {
-        return $this->chain->handle($data);
     }
 }

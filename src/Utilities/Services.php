@@ -8,12 +8,15 @@
 namespace App\Utilities;
 
 
+use App\Services\Stores;
+
 /**
  * Class Services
  * @package App\Utilities\Services
  * @property-read \App\Services\Products $products
  * @property-read \App\Services\Categories $categories
  * @property-read \App\Services\Users $users
+ * @property-read Stores $stores
  */
 class Services
 {

@@ -21,10 +21,12 @@ class RequestedActionMiddleware extends AbstractMiddleware
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $requestedAction = explode('\\', $request->getAttribute('__route__')->getCallable()); // called action
-        $requestedAction = join('\\', array_splice($requestedAction, 2, count($requestedAction) - 1));
+        $route = $request->getAttribute('__route__');
+        $requestedAction = $route->getCallable(); // called action as string
+        $requestedActionObject = $route->getCallableResolver()->resolveRoute($requestedAction); // called action as object
 
-        $request = $request->withAttribute('requested_action', $requestedAction);
+        $request = $request->withAttribute('requested_action_as_string', $requestedAction);
+        $request = $request->withAttribute('requested_action_as_object', reset($requestedActionObject));
 
         return $handler->handle($request);
     }

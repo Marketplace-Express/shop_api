@@ -17,13 +17,15 @@ abstract class AbstractMiddleware implements MiddlewareInterface
 {
     /**
      * @param \Throwable $exception
+     * @param int $code
      * @return Response
      */
-    public function respondWithError(\Throwable $exception)
+    public function respondWithError(\Throwable $exception, $code = 400)
     {
-        $response = new Response($exception->getCode());
+        $code = $exception->getCode() ?: $code;
+        $response = new Response($code);
         $errorMessage = [
-            'statusCode' => $exception->getCode(),
+            'statusCode' => $code,
             'data' => $exception->getMessage()
         ];
         $response->getBody()->write(json_encode($errorMessage, JSON_PRETTY_PRINT));

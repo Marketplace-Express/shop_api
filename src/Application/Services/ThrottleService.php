@@ -45,23 +45,27 @@ class ThrottleService
         return join(':', [self::KEY_PREFIX, $key]);
     }
 
-    private function setThrottleValue(int $tries)
+    /**
+     * @param int $lastActivity
+     * @param int $triesPerHour
+     * @param int $triesPerDay
+     * @return string
+     */
+    private function setThrottleValue(int $lastActivity, int $triesPerHour, int $triesPerDay): string
     {
-        return join(':', [strtotime('now'), $tries]);
+        return join(':', [$lastActivity, $triesPerHour, $triesPerDay]);
     }
 
-    public function getThrottleValue(string $ip, string $action)
+    /**
+     * @param string $key
+     * @param string $action
+     * @return array
+     */
+    public function getThrottleValue(string $key, string $action)
     {
-        $value = $this->connector->redis->hGet($this->keyBuilder($ip), $action);
+        $value = $this->connector->redis->hGet($key, $action);
 
-        return $value ? array_map('intval', explode(':', $value)) : [strtotime('now'), 0];
-    }
-
-    public function set(string $ip, string $action, int $tries = 0, int $ttl = -1)
-    {
-        $key = $this->keyBuilder($ip);
-        $this->connector->redis->hSet($key, $action, $this->setThrottleValue($tries));
-        $this->connector->redis->expire($key, $ttl);
+        return $value ? array_map('intval', explode(':', $value)) : [time(), 0, 0];
     }
 
     /**
@@ -71,17 +75,48 @@ class ThrottleService
      */
     public function checkThrottle(string $ip, string $action): bool
     {
-        if (empty($action)) {
+        if (empty($action) || !isset($this->throttleSettings[$action])) {
             return true;
         }
 
-        [$lastActivity, $tries] = $this->getThrottleValue($ip, $action);
-        $triesPerHour = $this->throttleSettings[$action][3600];
-        $triesPerDay = $this->throttleSettings[$action][86400];
+        $key = $this->keyBuilder($ip);
+        [$lastActivity, $triesPerHour, $triesPerDay] = $this->getThrottleValue($key, $action);
+        $triesPerHourSetting = $this->throttleSettings[$action][3600];
+        $triesPerDaySetting = $this->throttleSettings[$action][86400];
 
-        $now = strtotime('now');
+        if ($triesPerDay >= $triesPerDaySetting) {
+            return false;
+        }
 
-        return ($now - $lastActivity <= 3600 && $tries < $triesPerHour)
-            || ((3600 < $now - $lastActivity) && ($now - $lastActivity) <= 86400 && $tries < $triesPerDay);
+        if (time() - $lastActivity <= 3600 && $triesPerHour >= $triesPerHourSetting) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $ip
+     * @param string $action
+     */
+    public function addTry(string $ip, string $action)
+    {
+        $key = $this->keyBuilder($ip);
+
+        $setExpiry = !$this->connector->redis->exists($key);
+
+        [$lastActivity, $triesPerHour, $triesPerDay] = $this->getThrottleValue($key, $action);
+
+        if (time() - $lastActivity > 3600) {
+            $throttle = $this->setThrottleValue(time(), 1, ++$triesPerDay);
+        } else {
+            $throttle = $this->setThrottleValue($lastActivity, ++$triesPerHour, ++$triesPerDay);
+        }
+
+        $this->connector->redis->hSet($key, $action, $throttle);
+
+        if ($setExpiry) {
+            $this->connector->redis->expire($key, 86400);
+        }
     }
 }

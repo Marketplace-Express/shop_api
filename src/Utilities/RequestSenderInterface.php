@@ -29,10 +29,22 @@ interface RequestSenderInterface
     public function setMethod(string $method);
 
     /**
+     * @param array $headers
+     * @return RequestSenderInterface
+     */
+    public function setHeaders(array $headers = []);
+
+    /**
      * @param array $data
      * @return RequestSenderInterface
      */
     public function setBody(array $data);
+
+    /**
+     * @param array $data
+     * @return RequestSenderInterface
+     */
+    public function setQuery(array $data);
 
     /**
      * Send sync request to another endpoint

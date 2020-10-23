@@ -1,45 +1,55 @@
 <?php
 /**
  * User: Wajdi Jurry
- * Date: 2020/09/13
- * Time: 15:53
+ * Date: 2020/10/03
+ * Time: 15:29
  */
 
 namespace App\Application\Actions\User;
 
 
 use App\Application\Actions\Action;
-use App\Application\Chains\User\RegisterChain;
-use App\Utilities\RequestSender;
+use App\Application\Chains\User\LoginChain;
 use App\Utilities\RequestSenderInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Log\LoggerInterface;
 
-class RegisterAction extends Action
+class LoginAction extends Action
 {
     /**
-     * @var RequestSender
+     * @var bool
+     */
+    protected $forceLogUsage = true;
+
+    /**
+     * @var RequestSenderInterface
      */
     private $requestSender;
 
-    private $chainRequest;
+    /**
+     * @var LoginChain
+     */
+    private $chain;
 
     /**
-     * RegisterAction constructor.
+     * LoginAction constructor.
      * @param LoggerInterface $logger
      * @param RequestSenderInterface $requestSender
      */
     public function __construct(LoggerInterface $logger, RequestSenderInterface $requestSender)
     {
         $this->requestSender = $requestSender;
-        $this->chainRequest = (new RegisterChain($requestSender, $logger))->initiate();
+        $this->chain = (new LoginChain($requestSender, $logger))->initiate();
     }
 
     protected function action(): Response
     {
         try {
-            $response = $this->chainRequest->run(
-                $this->getRequestBody(true)
+            $response = $this->chain->run(
+                array_merge(
+                    $this->getRequestBody(true),
+                    ['csrf-token' => $this->request->getHeaderLine('csrf-token')]
+                )
             );
         } catch (\Throwable $exception) {
             $response = $this->prepareException($exception);

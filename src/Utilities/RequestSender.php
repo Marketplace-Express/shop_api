@@ -20,6 +20,7 @@ class RequestSender implements RequestSenderInterface
     private $route;
     private $method;
     private $correlationId;
+    private $headers = [];
     private $body = [];
     private $query = [];
     private $replyTo = null;
@@ -85,6 +86,13 @@ class RequestSender implements RequestSenderInterface
     public function setMethod(string $method)
     {
         $this->method = $method;
+
+        return $this;
+    }
+
+    public function setHeaders(array $headers = [])
+    {
+        $this->headers = $headers;
 
         return $this;
     }
@@ -171,13 +179,12 @@ class RequestSender implements RequestSenderInterface
     public function getResponse(AMQPMessage $response)
     {
         if ($response->get('correlation_id') == $this->correlationId) {
-            $this->response = json_decode($response->getBody(), true);
+            $this->response = json_decode($response->getBody(), true) ?? [];
             if (array_key_exists('hasError', $this->response) && true === $this->response['hasError']) {
                 $this->channel->basic_ack($response->delivery_info['delivery_tag']);
-                throw new \Exception($this->response['message'], $this->response['code']);
+                throw new \Exception($this->response['message'], $this->response['status']);
             }
         }
-
     }
 
     /**
@@ -202,6 +209,7 @@ class RequestSender implements RequestSenderInterface
         $message = new AMQPMessage(json_encode([
             'route' => $this->route,
             'method' => $this->method,
+            'headers' => $this->headers,
             'query' => $this->query,
             'body' => $this->body,
         ]), [
@@ -214,11 +222,12 @@ class RequestSender implements RequestSenderInterface
         // Waiting response
         $this->waitResponse();
 
-        // close connection
-        $this->channel->close();
+        // Store response in variable and unset the original one
+        $response = $this->response;
+        unset($this->response);
 
         // Return response
-        return $this->response;
+        return $response;
     }
 
     public function sendAsync()
@@ -231,10 +240,10 @@ class RequestSender implements RequestSenderInterface
         $message = new AMQPMessage(json_encode([
             'route' => $this->route,
             'method' => $this->method,
+            'headers' => $this->headers,
             'body' => $this->body,
             'query' => $this->query
         ]));
         $this->channel->basic_publish($message, $this->exchange, $this->queueName);
-        $this->channel->close();
     }
 }

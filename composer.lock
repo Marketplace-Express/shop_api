@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "efd63057979f937c8ad439fab82387fb",
+    "content-hash": "7555132fb9fb9a708b62aeb857eccdd6",
     "packages": [
         {
             "name": "akrabat/ip-address-middleware",
@@ -204,6 +204,58 @@
                 }
             ],
             "time": "2020-05-25T17:44:05+00:00"
+        },
+        {
+            "name": "dyorg/slim-token-authentication",
+            "version": "0.3.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dyorg/slim-token-authentication.git",
+                "reference": "08847d3ce38e47c422d46389886d0bd8bf4a9cb2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dyorg/slim-token-authentication/zipball/08847d3ce38e47c422d46389886d0bd8bf4a9cb2",
+                "reference": "08847d3ce38e47c422d46389886d0bd8bf4a9cb2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.6",
+                "squizlabs/php_codesniffer": "~2.3",
+                "zendframework/zend-diactoros": "^1.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Slim\\Middleware\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Dyorg Almeida",
+                    "email": "dyorg@rabbiit.com",
+                    "homepage": "https://rabbiit.com/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Slim 3.0+ Token Authentication Middleware",
+            "homepage": "https://github.com/dyorg/slim-token-authentication",
+            "keywords": [
+                "Authentication",
+                "auth",
+                "authorization",
+                "middleware",
+                "slim",
+                "token"
+            ],
+            "time": "2016-12-23T21:14:24+00:00"
         },
         {
             "name": "ethanhann/redis-raw",

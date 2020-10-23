@@ -35,7 +35,8 @@ return function (ContainerBuilder $containerBuilder) {
                     ), [
                         App\Services\Categories::class,
                         App\Services\Products::class,
-                        App\Services\Users::class
+                        App\Services\Users::class,
+                        App\Services\Stores::class
                     ]
                 );
             },
@@ -47,15 +48,29 @@ return function (ContainerBuilder $containerBuilder) {
                     $_ENV['REDIS_PASSWORD']
                 );
             },
+            'tokenAuth' => function () {
+                return new Slim\Middleware\TokenAuthentication();
+            }
         ],
         [
             'throttleService' => DI\autowire(App\Application\Services\ThrottleService::class)
                 ->constructorParameter('connector', DI\get('redisConnector'))
-                ->constructorParameter('container', DI\get('container'))
+                ->constructorParameter('container', DI\get('container')),
+
+            'authService' => DI\autowire(App\Application\Services\AuthService::class)
+                ->constructorParameter('requestSender', DI\get(App\Utilities\RequestSenderInterface::class))
         ],
         [
             'throttleMiddleware' => DI\autowire(App\Application\Middleware\ThrottleMiddleware::class)
-                ->constructorParameter('service', DI\get('throttleService'))
+                ->constructorParameter('service', DI\get('throttleService')),
+
+            'authenticateMiddleware' => DI\autowire(App\Application\Middleware\AuthenticateMiddleware::class)
+                ->constructorParameter('service', DI\get('authService'))
+                ->constructorParameter('tokenAuthentication', DI\get('tokenAuth')),
+
+            'authorizeMiddleware' => DI\autowire(App\Application\Middleware\AuthorizeMiddleware::class)
+                ->constructorParameter('service', DI\get('authService'))
+                ->constructorParameter('tokenAuthentication', DI\get('tokenAuth')),
         ]
     );
 };

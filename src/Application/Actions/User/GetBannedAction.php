@@ -1,45 +1,45 @@
 <?php
 /**
  * User: Wajdi Jurry
- * Date: 2020/09/13
- * Time: 15:53
+ * Date: 2020/10/16
+ * Time: 12:24
  */
 
 namespace App\Application\Actions\User;
 
 
 use App\Application\Actions\Action;
-use App\Application\Chains\User\RegisterChain;
-use App\Utilities\RequestSender;
+use App\Application\Chains\User\GetBannedChain;
 use App\Utilities\RequestSenderInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Log\LoggerInterface;
 
-class RegisterAction extends Action
+class GetBannedAction extends Action
 {
     /**
-     * @var RequestSender
+     * @var RequestSenderInterface
      */
     private $requestSender;
 
-    private $chainRequest;
-
     /**
-     * RegisterAction constructor.
-     * @param LoggerInterface $logger
-     * @param RequestSenderInterface $requestSender
+     * @var LoggerInterface
      */
-    public function __construct(LoggerInterface $logger, RequestSenderInterface $requestSender)
+    private $logger;
+
+    private $chain;
+
+    public function __construct(RequestSenderInterface $requestSender, LoggerInterface $logger)
     {
         $this->requestSender = $requestSender;
-        $this->chainRequest = (new RegisterChain($requestSender, $logger))->initiate();
+        $this->logger = $logger;
+        $this->chain = (new GetBannedChain($requestSender, $logger))->initiate();
     }
 
     protected function action(): Response
     {
         try {
-            $response = $this->chainRequest->run(
-                $this->getRequestBody(true)
+            $response = $this->chain->run(
+                $this->request->getQueryParams()
             );
         } catch (\Throwable $exception) {
             $response = $this->prepareException($exception);
