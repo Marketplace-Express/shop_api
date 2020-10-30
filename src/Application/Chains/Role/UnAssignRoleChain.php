@@ -1,15 +1,15 @@
 <?php
 /**
  * User: Wajdi Jurry
- * Date: 2020/10/17
- * Time: 10:49
+ * Date: 2020/10/30
+ * Time: 17:40
  */
 
 namespace App\Application\Chains\Role;
 
 
 use App\Application\Chains\AbstractChain;
-use App\Application\Handlers\Role\GetRole;
+use App\Application\Handlers\Role\UnAssignRole;
 use App\Application\Handlers\Store\IsStoreOwner;
 use App\Application\Handlers\User\Authenticate;
 use App\Application\Handlers\User\Authorize;
@@ -17,7 +17,7 @@ use App\Utilities\RequestSenderInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Middleware\TokenAuthentication;
 
-class GetRoleChain extends AbstractChain
+class UnAssignRoleChain extends AbstractChain
 {
     /**
      * @var RequestSenderInterface
@@ -25,23 +25,29 @@ class GetRoleChain extends AbstractChain
     private $requestSender;
 
     /**
+     * @var TokenAuthentication
+     */
+    private $tokenAuthentication;
+
+    /**
      * @var ServerRequestInterface
      */
     private $request;
 
     /**
-     * @var TokenAuthentication
+     * UnAssignRoleChain constructor.
+     * @param RequestSenderInterface $requestSender
+     * @param TokenAuthentication $tokenAuthentication
+     * @param ServerRequestInterface $request
      */
-    private $tokenAuthentication;
-
     public function __construct(
         RequestSenderInterface $requestSender,
-        ServerRequestInterface $request,
-        TokenAuthentication $tokenAuthentication
+        TokenAuthentication $tokenAuthentication,
+        ServerRequestInterface $request
     ) {
         $this->requestSender = $requestSender;
-        $this->request = $request;
         $this->tokenAuthentication = $tokenAuthentication;
+        $this->request = $request;
     }
 
     public function initiate()
@@ -53,7 +59,7 @@ class GetRoleChain extends AbstractChain
         $handlers
             ->next(new IsStoreOwner($this->requestSender, $storeId))
             ->next(new Authorize($this->requestSender, $this->request, $this->tokenAuthentication, ['storeId' => $storeId]))
-            ->next(new GetRole($this->requestSender));
+            ->next(new UnAssignRole($this->requestSender));
 
         $this->handlers = $handlers;
 

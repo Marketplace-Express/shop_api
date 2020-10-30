@@ -1,18 +1,18 @@
 <?php
 /**
  * User: Wajdi Jurry
- * Date: 2020/10/04
- * Time: 13:24
+ * Date: 2020/10/29
+ * Time: 01:12
  */
 
-namespace App\Application\Handlers\User;
+namespace App\Application\Handlers\Role;
 
 
 use App\Application\Handlers\AbstractHandler;
 use App\Utilities\RequestSenderInterface;
 use Fig\Http\Message\StatusCodeInterface;
 
-class Ban extends AbstractHandler
+class UpdateRole extends AbstractHandler
 {
     /**
      * @var RequestSenderInterface
@@ -20,7 +20,7 @@ class Ban extends AbstractHandler
     private $requestSender;
 
     /**
-     * Ban constructor.
+     * UpdateRole constructor.
      * @param RequestSenderInterface $requestSender
      */
     public function __construct(RequestSenderInterface $requestSender)
@@ -30,12 +30,10 @@ class Ban extends AbstractHandler
 
     public function handle(array $data = [])
     {
-        if (empty($data['userId']) || empty($data['reason'])) {
-            throw new \Exception('user id or reason not provided', StatusCodeInterface::STATUS_BAD_REQUEST);
+        if (empty($data['role_id']) || empty($data['role_name'])) {
+            throw new \InvalidArgumentException('role id or role name not provided', StatusCodeInterface::STATUS_BAD_REQUEST);
         }
 
-        $this->requestSender->services->users->ban($data['userId'], $data['reason'], $data['description']);
-
-        return parent::handle($data);
+        return $this->requestSender->services->users->updateRole($data['role_id'], $data['role_name']);
     }
 }

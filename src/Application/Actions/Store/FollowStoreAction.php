@@ -1,16 +1,15 @@
 <?php
 /**
  * User: Wajdi Jurry
- * Date: 2020/10/10
- * Time: 14:36
+ * Date: 2020/10/30
+ * Time: 15:22
  */
 
-namespace App\Application\Actions\User;
+namespace App\Application\Actions\Store;
 
 
 use App\Application\Actions\Action;
-use App\Application\Actions\Permissions;
-use App\Application\Chains\User\UnBanChain;
+use App\Application\Chains\Store\FollowStoreChain;
 use App\Utilities\RequestSenderInterface;
 use Fig\Http\Message\StatusCodeInterface;
 use Psr\Container\ContainerInterface;
@@ -18,10 +17,10 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
 
-class UnBanAction extends Action
+class FollowStoreAction extends Action
 {
     /**
-     * @var UnBanChain
+     * @var FollowStoreChain
      */
     private $chain;
 
@@ -31,7 +30,7 @@ class UnBanAction extends Action
     private $container;
 
     /**
-     * UnBanAction constructor.
+     * FollowStoreAction constructor.
      * @param ContainerInterface $container
      */
     public function __construct(ContainerInterface $container)
@@ -42,24 +41,18 @@ class UnBanAction extends Action
     public function __invoke(Request $request, Response $response, $args): Response
     {
         $requestSender = $this->container->get(RequestSenderInterface::class);
-        $logger = $this->container->get(LoggerInterface::class);
         $tokenAuth = $this->container->get('tokenAuth');
+        $logger = $this->container->get(LoggerInterface::class);
 
-        $this->chain = (new UnBanChain($requestSender, $logger, $tokenAuth, $request))->initiate();
-
+        $this->chain = (new FollowStoreChain($requestSender, $tokenAuth, $request, $logger))->initiate();
         return parent::__invoke($request, $response, $args);
     }
 
-    /**
-     * @return Response
-     *
-     * @Permissions(policyModel="User")
-     */
     protected function action(): Response
     {
         try {
             $this->chain->run(
-                ['userId' => $this->request->getAttribute('userId')]
+                ['storeId' => $this->request->getAttribute('storeId')]
             );
 
             $response = ['status' => StatusCodeInterface::STATUS_NO_CONTENT, 'message' => ''];

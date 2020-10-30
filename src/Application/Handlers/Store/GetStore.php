@@ -25,12 +25,17 @@ class GetStore extends AbstractHandler
 
     public function handle(array $data = [])
     {
-        if (empty($data['store_id'])) {
-            throw new \Exception('store_id not provided', 400);
+        if (empty($data['storeId'])) {
+            throw new \Exception('store id not provided', 400);
         }
 
-        $this->requestSender->services->stores->getById($data['store_id']);
+        $response = $this->requestSender->services->stores->getById($data['storeId']);
+        $data['store'] = $response['message'];
 
-        return parent::handle($data);
+        if ($this->next) {
+            return parent::handle($data);
+        } else {
+            return $response['message'];
+        }
     }
 }

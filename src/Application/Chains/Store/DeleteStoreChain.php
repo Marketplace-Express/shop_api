@@ -1,23 +1,26 @@
 <?php
 /**
  * User: Wajdi Jurry
- * Date: 2020/10/17
- * Time: 10:49
+ * Date: 2020/10/30
+ * Time: 00:29
  */
 
-namespace App\Application\Chains\Role;
+namespace App\Application\Chains\Store;
 
 
 use App\Application\Chains\AbstractChain;
-use App\Application\Handlers\Role\GetRole;
+use App\Application\Handlers\Logger;
+use App\Application\Handlers\Role\DeleteRole;
+use App\Application\Handlers\Store\DeleteStore;
 use App\Application\Handlers\Store\IsStoreOwner;
 use App\Application\Handlers\User\Authenticate;
 use App\Application\Handlers\User\Authorize;
 use App\Utilities\RequestSenderInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 use Slim\Middleware\TokenAuthentication;
 
-class GetRoleChain extends AbstractChain
+class DeleteStoreChain extends AbstractChain
 {
     /**
      * @var RequestSenderInterface
@@ -25,35 +28,50 @@ class GetRoleChain extends AbstractChain
     private $requestSender;
 
     /**
+     * @var TokenAuthentication
+     */
+    private $tokenAuthentication;
+
+    /**
      * @var ServerRequestInterface
      */
     private $request;
 
     /**
-     * @var TokenAuthentication
+     * @var LoggerInterface
      */
-    private $tokenAuthentication;
+    private $logger;
 
+    /**
+     * DeleteStoreChain constructor.
+     * @param RequestSenderInterface $requestSender
+     * @param TokenAuthentication $tokenAuthentication
+     * @param ServerRequestInterface $request
+     * @param LoggerInterface $logger
+     */
     public function __construct(
         RequestSenderInterface $requestSender,
+        TokenAuthentication $tokenAuthentication,
         ServerRequestInterface $request,
-        TokenAuthentication $tokenAuthentication
+        LoggerInterface $logger
     ) {
         $this->requestSender = $requestSender;
-        $this->request = $request;
         $this->tokenAuthentication = $tokenAuthentication;
+        $this->request = $request;
+        $this->logger = $logger;
     }
 
     public function initiate()
     {
-        $storeId = $this->request->getHeaderLine('storeId');
+        $storeId = $this->request->getAttribute('storeId');
 
         $handlers = new Authenticate($this->requestSender, $this->request, $this->tokenAuthentication);
 
         $handlers
             ->next(new IsStoreOwner($this->requestSender, $storeId))
             ->next(new Authorize($this->requestSender, $this->request, $this->tokenAuthentication, ['storeId' => $storeId]))
-            ->next(new GetRole($this->requestSender));
+            ->next(new DeleteStore($this->requestSender))
+            ->next(new Logger($this->logger, "store deleted"));
 
         $this->handlers = $handlers;
 

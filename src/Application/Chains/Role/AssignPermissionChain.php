@@ -1,23 +1,25 @@
 <?php
 /**
  * User: Wajdi Jurry
- * Date: 2020/10/17
- * Time: 10:49
+ * Date: 2020/10/24
+ * Time: 13:52
  */
 
 namespace App\Application\Chains\Role;
 
 
 use App\Application\Chains\AbstractChain;
-use App\Application\Handlers\Role\GetRole;
+use App\Application\Handlers\Logger;
+use App\Application\Handlers\Role\AssignPermission;
 use App\Application\Handlers\Store\IsStoreOwner;
 use App\Application\Handlers\User\Authenticate;
 use App\Application\Handlers\User\Authorize;
 use App\Utilities\RequestSenderInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 use Slim\Middleware\TokenAuthentication;
 
-class GetRoleChain extends AbstractChain
+class AssignPermissionChain extends AbstractChain
 {
     /**
      * @var RequestSenderInterface
@@ -25,23 +27,37 @@ class GetRoleChain extends AbstractChain
     private $requestSender;
 
     /**
-     * @var ServerRequestInterface
+     * @var LoggerInterface
      */
-    private $request;
+    private $logger;
 
     /**
      * @var TokenAuthentication
      */
     private $tokenAuthentication;
 
+    /**
+     * @var ServerRequestInterface
+     */
+    private $request;
+
+    /**
+     * AssignPermissionChain constructor.
+     * @param RequestSenderInterface $requestSender
+     * @param LoggerInterface $logger
+     * @param TokenAuthentication $tokenAuthentication
+     * @param ServerRequestInterface $request
+     */
     public function __construct(
         RequestSenderInterface $requestSender,
-        ServerRequestInterface $request,
-        TokenAuthentication $tokenAuthentication
+        LoggerInterface $logger,
+        TokenAuthentication $tokenAuthentication,
+        ServerRequestInterface $request
     ) {
         $this->requestSender = $requestSender;
-        $this->request = $request;
+        $this->logger = $logger;
         $this->tokenAuthentication = $tokenAuthentication;
+        $this->request = $request;
     }
 
     public function initiate()
@@ -53,7 +69,8 @@ class GetRoleChain extends AbstractChain
         $handlers
             ->next(new IsStoreOwner($this->requestSender, $storeId))
             ->next(new Authorize($this->requestSender, $this->request, $this->tokenAuthentication, ['storeId' => $storeId]))
-            ->next(new GetRole($this->requestSender));
+            ->next(new AssignPermission($this->requestSender))
+            ->next(new Logger($this->logger, "permission assigned to role"));
 
         $this->handlers = $handlers;
 

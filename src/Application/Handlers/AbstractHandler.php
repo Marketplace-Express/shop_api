@@ -10,7 +10,7 @@ namespace App\Application\Handlers;
 
 abstract class AbstractHandler implements HandlerInterface
 {
-    private $next;
+    protected $next;
 
     /**
      * @param AbstractHandler $handler

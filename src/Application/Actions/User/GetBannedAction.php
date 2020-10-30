@@ -9,32 +9,51 @@ namespace App\Application\Actions\User;
 
 
 use App\Application\Actions\Action;
+use App\Application\Actions\Permissions;
 use App\Application\Chains\User\GetBannedChain;
 use App\Utilities\RequestSenderInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
 
 class GetBannedAction extends Action
 {
     /**
-     * @var RequestSenderInterface
+     * @var GetBannedChain
      */
-    private $requestSender;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
     private $chain;
 
-    public function __construct(RequestSenderInterface $requestSender, LoggerInterface $logger)
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    /**
+     * GetBannedAction constructor.
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container)
     {
-        $this->requestSender = $requestSender;
-        $this->logger = $logger;
-        $this->chain = (new GetBannedChain($requestSender, $logger))->initiate();
+        $this->container = $container;
     }
 
+    public function __invoke(Request $request, Response $response, $args): Response
+    {
+        $requestSender = $this->container->get(RequestSenderInterface::class);
+        $logger = $this->container->get(LoggerInterface::class);
+        $tokenAuth = $this->container->get('tokenAuth');
+
+        $this->chain = (new GetBannedChain($requestSender, $logger, $tokenAuth, $request))->initiate();
+
+        return parent::__invoke($request, $response, $args);
+    }
+
+    /**
+     * @return Response
+     *
+     * @Permissions(policyModel="User")
+     */
     protected function action(): Response
     {
         try {

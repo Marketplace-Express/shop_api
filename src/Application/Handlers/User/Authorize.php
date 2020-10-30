@@ -9,31 +9,15 @@ namespace App\Application\Handlers\User;
 
 
 use App\Application\Actions\Permissions;
-use App\Application\Handlers\AbstractHandler;
 use App\Utilities\RequestSenderInterface;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Fig\Http\Message\StatusCodeInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Middleware\TokenAuthentication;
-use Slim\Middleware\TokenAuthentication\TokenNotFoundException;
 
-class Authorize extends AbstractHandler
+class Authorize extends AbstractUserAccess
 {
-    /**
-     * @var RequestSenderInterface
-     */
-    private $requestSender;
-
-    /**
-     * @var ServerRequestInterface
-     */
-    private $request;
-    /**
-     * @var TokenAuthentication
-     */
-    private $tokenAuthentication;
-
     /**
      * @var array
      */
@@ -52,9 +36,7 @@ class Authorize extends AbstractHandler
         TokenAuthentication $tokenAuthentication,
         array $authorizeData = []
     ) {
-        $this->requestSender = $requestSender;
-        $this->request = $request;
-        $this->tokenAuthentication = $tokenAuthentication;
+        parent::__construct($requestSender, $request, $tokenAuthentication);
         $this->authorizeData = $authorizeData;
     }
 
@@ -63,11 +45,19 @@ class Authorize extends AbstractHandler
         $permissions = $this->getActionPermissions($this->request->getAttribute('requested_action_as_string'));
 
         if (empty($permissions->policyModel)) {
-            throw new \InvalidArgumentException('policyModel is not provided', 400);
+            throw new \InvalidArgumentException('policy model is not provided', StatusCodeInterface::STATUS_UNAUTHORIZED);
+        }
+
+        if (empty($data['user'])) {
+            throw new \Exception('unauthorized', StatusCodeInterface::STATUS_UNAUTHORIZED);
+        }
+
+        if (isset($data['store_owner'])) {
+            $this->authorizeData['storeOwner'] = $data['store_owner'];
         }
 
         $isAuthorized = $this->requestSender->services->users->isAuthorized(
-            $this->getToken(),
+            $data['user'],
             ['csrf-token' => $this->getCsrfToken()],
             $permissions->grants,
             $permissions->operator,
@@ -76,31 +66,10 @@ class Authorize extends AbstractHandler
         );
 
         if (empty($isAuthorized['message'])) {
-            throw new \Exception('unauthorized', 401);
+            throw new \Exception('unauthorized', StatusCodeInterface::STATUS_UNAUTHORIZED);
         }
 
         return parent::handle($data);
-    }
-
-    /**
-     * @return mixed
-     * @throws \Exception
-     */
-    private function getToken()
-    {
-        try {
-            return $this->tokenAuthentication->findToken($this->request);
-        } catch (TokenNotFoundException $exception) {
-            throw new \Exception('unauthorized', StatusCodeInterface::STATUS_UNAUTHORIZED);
-        }
-    }
-
-    /**
-     * @return string
-     */
-    private function getCsrfToken()
-    {
-        return $this->request->getHeaderLine('csrf-token');
     }
 
     /**

@@ -58,7 +58,9 @@ class CreateRoleAction extends Action
     {
         try {
             $response = $this->chain->run(
-                $this->getRequestBody(true)
+                array_merge($this->getRequestBody(true), [
+                    'storeId' => $this->request->getHeaderLine('storeId')
+                ])
             );
         } catch (\Throwable $exception) {
             $response = $this->prepareException($exception);

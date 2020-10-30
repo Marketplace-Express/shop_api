@@ -25,6 +25,12 @@ class GetRole extends AbstractHandler
 
     public function handle(array $data = [])
     {
-        return $this->requestSender->services->users->getRole($data['roleId']);
+        $role = $this->requestSender->services->users->getRole($data['roleId']);
+
+        if ($this->next) {
+            return parent::handle(array_merge($data, ['role' => $role]));
+        } else {
+            return $role;
+        }
     }
 }

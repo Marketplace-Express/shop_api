@@ -1,17 +1,18 @@
 <?php
 /**
  * User: Wajdi Jurry
- * Date: 2020/10/10
- * Time: 15:22
+ * Date: 2020/10/24
+ * Time: 01:41
  */
 
-namespace App\Application\Handlers\User;
+namespace App\Application\Handlers\Role;
 
 
 use App\Application\Handlers\AbstractHandler;
 use App\Utilities\RequestSenderInterface;
+use Fig\Http\Message\StatusCodeInterface;
 
-class UnBan extends AbstractHandler
+class DeleteRole extends AbstractHandler
 {
     /**
      * @var RequestSenderInterface
@@ -19,7 +20,7 @@ class UnBan extends AbstractHandler
     private $requestSender;
 
     /**
-     * UnBan constructor.
+     * DeleteRole constructor.
      * @param RequestSenderInterface $requestSender
      */
     public function __construct(RequestSenderInterface $requestSender)
@@ -29,8 +30,12 @@ class UnBan extends AbstractHandler
 
     public function handle(array $data = [])
     {
-        $this->requestSender->services->users->unBan($data['userId']);
+        if (empty($data['roleId'])) {
+            throw new \InvalidArgumentException('role id not provided', StatusCodeInterface::STATUS_BAD_REQUEST);
+        }
 
-        return parent::handle();
+        $this->requestSender->services->users->deleteRole($data['roleId']);
+
+        return parent::handle($data);
     }
 }

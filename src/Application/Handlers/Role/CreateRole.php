@@ -10,6 +10,7 @@ namespace App\Application\Handlers\Role;
 
 use App\Application\Handlers\AbstractHandler;
 use App\Utilities\RequestSenderInterface;
+use Fig\Http\Message\StatusCodeInterface;
 
 class CreateRole extends AbstractHandler
 {
@@ -29,7 +30,11 @@ class CreateRole extends AbstractHandler
 
     public function handle(array $data = [])
     {
-        $response = $this->requestSender->services->users->createRole($data['role_name'], $data['store_id']);
+        if (empty($data['role_name']) || empty($data['storeId'])) {
+            throw new \InvalidArgumentException('role name or store id not provided', StatusCodeInterface::STATUS_BAD_REQUEST);
+        }
+
+        $response = $this->requestSender->services->users->createRole($data['role_name'], $data['storeId']);
 
         return parent::handle($response);
     }

@@ -13,28 +13,46 @@ use App\Application\Actions\Permissions;
 use App\Application\Chains\User\BanChain;
 use App\Utilities\RequestSenderInterface;
 use Fig\Http\Message\StatusCodeInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
 
 class BanAction extends Action
 {
+    /**
+     * @var BanChain
+     */
     private $chain;
 
     /**
-     * @var LoggerInterface
+     * @var ContainerInterface
      */
-    private $logger;
+    private $container;
 
-    public function __construct(LoggerInterface $logger, RequestSenderInterface $requestSender)
+    /**
+     * BanAction constructor.
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container)
     {
-        $this->chain = (new BanChain($requestSender, $logger))->initiate();
-        $this->logger = $logger;
+        $this->container = $container;
+    }
+
+    public function __invoke(Request $request, Response $response, $args): Response
+    {
+        $requestSender = $this->container->get(RequestSenderInterface::class);
+        $logger = $this->container->get(LoggerInterface::class);
+        $tokenAuth = $this->container->get('tokenAuth');
+
+        $this->chain = (new BanChain($requestSender, $logger, $tokenAuth, $request))->initiate();
+        return parent::__invoke($request, $response, $args);
     }
 
     /**
      * @return Response
      *
-     * @Permissions(operator="and", grants={"ban-user"})
+     * @Permissions(policyModel="User")
      */
     protected function action(): Response
     {

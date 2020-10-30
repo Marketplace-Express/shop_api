@@ -48,28 +48,25 @@ class Users extends AbstractService
     }
 
     public function isAuthorized(
-        string $token,
+        array $user,
         array $headers,
         array $permissions,
         string $operator,
         string $policyModel,
         array $authorizeData = []
-    )
-    {
+    ) {
         return $this->requestSender
             ->setQueueName(self::SYNC_QUEUE_NAME)
             ->setRoute('auth/authorized')
             ->setMethod('post')
             ->setHeaders($headers)
-            ->setBody(
-                [
-                    'token' => $token,
-                    'permissions' => $permissions,
-                    'operator' => $operator,
-                    'policyModel' => $policyModel,
-                    'authorizeData' => $authorizeData
-                ]
-            )->sendSync();
+            ->setBody([
+                'user' => $user,
+                'permissions' => $permissions,
+                'operator' => $operator,
+                'policyModel' => $policyModel,
+                'authorizeData' => $authorizeData
+            ])->sendSync();
     }
 
     public function ban(string $userId, $reason, $description)
@@ -117,6 +114,65 @@ class Users extends AbstractService
             ->setRoute('role/create')
             ->setMethod('post')
             ->setBody(['role_name' => $roleName, 'store_id' => $storeId])
+            ->sendSync();
+    }
+
+    public function deleteRole(string $roleId)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE_NAME)
+            ->setRoute(sprintf('role/%s', $roleId))
+            ->setMethod('delete')
+            ->sendSync();
+    }
+
+    public function updateRole(string $roleId, $roleName)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE_NAME)
+            ->setRoute(sprintf('role/%s', $roleId))
+            ->setMethod('put')
+            ->setBody(['role_name' => $roleName])
+            ->sendSync();
+    }
+
+    public function assignPermission($roleId, $permission)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE_NAME)
+            ->setRoute(sprintf('role/%s/permission', $roleId))
+            ->setMethod('put')
+            ->setBody(['permission' => $permission])
+            ->sendSync();
+    }
+
+    public function unAssignPermission($roleId, $permission)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE_NAME)
+            ->setRoute(sprintf('role/%s/permission', $roleId))
+            ->setMethod('delete')
+            ->setBody(['permission' => $permission])
+            ->sendSync();
+    }
+
+    public function assignRole(string $roleId, $userId)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE_NAME)
+            ->setRoute(sprintf('role/%s/user', $roleId))
+            ->setMethod('post')
+            ->setBody(['user_id' => $userId])
+            ->sendSync();
+    }
+
+    public function unAssignRole(string $roleId, $userId)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE_NAME)
+            ->setRoute(sprintf('role/%s/user', $roleId))
+            ->setMethod('delete')
+            ->setBody(['user_id' => $userId])
             ->sendSync();
     }
 }

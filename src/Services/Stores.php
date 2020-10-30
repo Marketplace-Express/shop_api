@@ -23,4 +23,68 @@ class Stores extends AbstractService
             ->setMethod('get')
             ->sendSync();
     }
+
+    public function isStoreOwner($userId, $storeId)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE_NAME)
+            ->setRoute(sprintf('store/%s/isOwner', $storeId))
+            ->setMethod('get')
+            ->setBody(['user_id' => $userId])
+            ->sendSync();
+    }
+
+    public function create(
+        $ownerId,
+        $name,
+        $description,
+        $type,
+        $location,
+        $photo,
+        $coverPhoto
+    ) {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE_NAME)
+            ->setRoute('store/')
+            ->setMethod('post')
+            ->setBody([
+                'ownerId' => $ownerId,
+                'name' => $name,
+                'description' => $description,
+                'type' => $type,
+                'location' => $location,
+                'photo' => $photo,
+                'coverPhoto' => $coverPhoto
+            ])
+            ->sendSync();
+    }
+
+    public function delete(string $storeId)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE_NAME)
+            ->setRoute(sprintf('store/%s', $storeId))
+            ->setMethod('delete')
+            ->sendSync();
+    }
+
+    public function follow(string $storeId, $followerId)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE_NAME)
+            ->setRoute(sprintf('follow/%s', $storeId))
+            ->setMethod('post')
+            ->setBody(['followerId' => $followerId])
+            ->sendSync();
+    }
+
+    public function getFollowers(string $storeId, $page, $limit)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE_NAME)
+            ->setRoute(sprintf('follow/%s/followers', $storeId))
+            ->setMethod('get')
+            ->setQuery(['page' => $page, 'limit' => $limit])
+            ->sendSync();
+    }
 }

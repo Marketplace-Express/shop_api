@@ -1,18 +1,17 @@
 <?php
 /**
  * User: Wajdi Jurry
- * Date: 2020/10/23
- * Time: 13:23
+ * Date: 2020/10/30
+ * Time: 13:37
  */
 
-namespace App\Application\Chains\Role;
+namespace App\Application\Chains\Store;
 
 
 use App\Application\Chains\AbstractChain;
 use App\Application\Handlers\Logger;
-use App\Application\Handlers\Role\CreateRole;
+use App\Application\Handlers\Store\FollowStore;
 use App\Application\Handlers\Store\GetStore;
-use App\Application\Handlers\Store\IsStoreOwner;
 use App\Application\Handlers\User\Authenticate;
 use App\Application\Handlers\User\Authorize;
 use App\Utilities\RequestSenderInterface;
@@ -20,62 +19,52 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Slim\Middleware\TokenAuthentication;
 
-class CreateRoleChain extends AbstractChain
+class FollowStoreChain extends AbstractChain
 {
+    /**
+     * @var RequestSenderInterface
+     */
+    private $requestSender;
+    /**
+     * @var TokenAuthentication
+     */
+    private $tokenAuthentication;
+    /**
+     * @var ServerRequestInterface
+     */
+    private $request;
     /**
      * @var LoggerInterface
      */
     private $logger;
 
     /**
-     * @var RequestSenderInterface
-     */
-    private $requestSender;
-
-    /**
-     * @var ServerRequestInterface
-     */
-    private $request;
-
-    /**
-     * @var TokenAuthentication
-     */
-    private $tokenAuthentication;
-
-    /**
-     * CreateRoleChain constructor.
-     * @param LoggerInterface $logger
+     * FollowStoreChain constructor.
      * @param RequestSenderInterface $requestSender
-     * @param ServerRequestInterface $request
      * @param TokenAuthentication $tokenAuthentication
+     * @param ServerRequestInterface $request
+     * @param LoggerInterface $logger
      */
     public function __construct(
-        LoggerInterface $logger,
         RequestSenderInterface $requestSender,
+        TokenAuthentication $tokenAuthentication,
         ServerRequestInterface $request,
-        TokenAuthentication $tokenAuthentication
+        LoggerInterface $logger
     ) {
-        $this->logger = $logger;
         $this->requestSender = $requestSender;
-        $this->request = $request;
         $this->tokenAuthentication = $tokenAuthentication;
+        $this->request = $request;
+        $this->logger = $logger;
     }
 
-    /**
-     * @return $this
-     */
     public function initiate()
     {
-        $storeId = $this->request->getHeaderLine('storeId');
-
         $handlers = new Authenticate($this->requestSender, $this->request, $this->tokenAuthentication);
 
         $handlers
-            ->next(new IsStoreOwner($this->requestSender, $storeId))
-            ->next(new Authorize($this->requestSender, $this->request, $this->tokenAuthentication, ['storeId' => $storeId]))
             ->next(new GetStore($this->requestSender)) // check if store exists
-            ->next(new CreateRole($this->requestSender))
-            ->next(new Logger($this->logger, "new role created"));
+            ->next(new FollowStore($this->requestSender))
+            ->next(new Logger($this->logger, "user follow store"));
 
         $this->handlers = $handlers;
 
