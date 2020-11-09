@@ -1,24 +1,24 @@
 <?php
 /**
  * User: Wajdi Jurry
- * Date: 2020/10/30
- * Time: 16:08
+ * Date: 2020/11/07
+ * Time: 15:31
  */
 
-namespace App\Application\Chains\Store;
+namespace App\Application\Chains\Category;
 
 
 use App\Application\Chains\AbstractChain;
-use App\Application\Handlers\Store\GetFollowers;
+use App\Application\Handlers\Category\CreateCategory;
+use App\Application\Handlers\Store\GetStore;
 use App\Application\Handlers\Store\IsStoreOwner;
 use App\Application\Handlers\User\Authenticate;
 use App\Application\Handlers\User\Authorize;
-use App\Application\Handlers\User\GetUsersByIds;
 use App\Utilities\RequestSenderInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Middleware\TokenAuthentication;
 
-class GetFollowersChain extends AbstractChain
+class CreateCategoryChain extends AbstractChain
 {
     /**
      * @var RequestSenderInterface
@@ -36,7 +36,7 @@ class GetFollowersChain extends AbstractChain
     private $request;
 
     /**
-     * GetFollowersChain constructor.
+     * CreateCategoryChain constructor.
      * @param RequestSenderInterface $requestSender
      * @param TokenAuthentication $tokenAuthentication
      * @param ServerRequestInterface $request
@@ -53,15 +53,13 @@ class GetFollowersChain extends AbstractChain
 
     public function initiate()
     {
-        $storeId = $this->request->getAttribute('storeId');
+        $storeId = $this->request->getHeaderLine('storeId');
 
         $handlers = new Authenticate($this->requestSender, $this->request, $this->tokenAuthentication);
-
         $handlers
             ->next(new IsStoreOwner($this->requestSender, $storeId))
             ->next(new Authorize($this->requestSender, $this->request, $this->tokenAuthentication, ['storeId' => $storeId]))
-            ->next(new GetFollowers($this->requestSender))
-            ->next(new GetUsersByIds($this->requestSender));
+            ->next(new CreateCategory($this->requestSender));
 
         $this->handlers = $handlers;
 

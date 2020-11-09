@@ -1,8 +1,8 @@
 <?php
 /**
  * User: Wajdi Jurry
- * Date: 2020/10/10
- * Time: 15:22
+ * Date: 2020/10/04
+ * Time: 13:24
  */
 
 namespace App\Application\Handlers\User;
@@ -10,8 +10,9 @@ namespace App\Application\Handlers\User;
 
 use App\Application\Handlers\AbstractHandler;
 use App\Utilities\RequestSenderInterface;
+use Fig\Http\Message\StatusCodeInterface;
 
-class UnBan extends AbstractHandler
+class BanUser extends AbstractHandler
 {
     /**
      * @var RequestSenderInterface
@@ -19,7 +20,7 @@ class UnBan extends AbstractHandler
     private $requestSender;
 
     /**
-     * UnBan constructor.
+     * Ban constructor.
      * @param RequestSenderInterface $requestSender
      */
     public function __construct(RequestSenderInterface $requestSender)
@@ -29,8 +30,12 @@ class UnBan extends AbstractHandler
 
     public function handle(array $data = [])
     {
-        $this->requestSender->services->users->unBan($data['userId']);
+        if (empty($data['userId']) || empty($data['reason'])) {
+            throw new \Exception('user id or reason not provided', StatusCodeInterface::STATUS_BAD_REQUEST);
+        }
 
-        return parent::handle();
+        $this->requestSender->services->users->ban($data['userId'], $data['reason'], $data['description']);
+
+        return parent::handle($data);
     }
 }

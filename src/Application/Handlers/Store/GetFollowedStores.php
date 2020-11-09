@@ -1,8 +1,8 @@
 <?php
 /**
  * User: Wajdi Jurry
- * Date: 2020/10/30
- * Time: 16:05
+ * Date: 2020/10/31
+ * Time: 00:11
  */
 
 namespace App\Application\Handlers\Store;
@@ -12,7 +12,7 @@ use App\Application\Handlers\AbstractHandler;
 use App\Utilities\RequestSenderInterface;
 use Fig\Http\Message\StatusCodeInterface;
 
-class GetFollowers extends AbstractHandler
+class GetFollowedStores extends AbstractHandler
 {
     /**
      * @var RequestSenderInterface
@@ -20,7 +20,7 @@ class GetFollowers extends AbstractHandler
     private $requestSender;
 
     /**
-     * GetFollowers constructor.
+     * GetFollowedStores constructor.
      * @param RequestSenderInterface $requestSender
      */
     public function __construct(RequestSenderInterface $requestSender)
@@ -30,21 +30,20 @@ class GetFollowers extends AbstractHandler
 
     public function handle(array $data = [])
     {
-        if (empty($data['storeId'])) {
-            throw new \InvalidArgumentException('store id not provided', StatusCodeInterface::STATUS_BAD_REQUEST);
+        if (empty($data['user'])) {
+            throw new \InvalidArgumentException('user data not provided', StatusCodeInterface::STATUS_BAD_REQUEST);
         }
 
         $data['page'] = $data['page'] ?? null;
         $data['limit'] = $data['limit'] ?? null;
 
-        $response = $this->requestSender->services->stores->getFollowers($data['storeId'], $data['page'], $data['limit']);
-        $data['followers'] = $data['users_ids'] = $response['message']['followers'];
-        $data['followers_count'] = $response['message']['count'];
+        $response = $this->requestSender->services->stores->getFollowed($data['user']['user_id'], $data['page'], $data['limit']);
+        $data = array_merge($data, ['followed_stores' => $response['message']]);
 
         if ($this->next) {
             return parent::handle($data);
+        } else {
+            return $response;
         }
-
-        return $response;
     }
 }

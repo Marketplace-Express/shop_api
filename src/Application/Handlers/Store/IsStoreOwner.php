@@ -38,11 +38,11 @@ class IsStoreOwner extends AbstractHandler
     public function handle(array $data = [])
     {
         if (empty($data['user']) || empty($this->storeId)) {
-            throw new \InvalidArgumentException('user id or store id not provided', StatusCodeInterface::STATUS_BAD_REQUEST);
+            $data = array_merge($data, ['store_owner' => false]);
+        } else {
+            $response = $this->requestSender->services->stores->isStoreOwner($data['user']['user_id'], $this->storeId);
+            $data = array_merge($data, ['store_owner' => $response['message']]);
         }
-
-        $response = $this->requestSender->services->stores->isStoreOwner($data['user']['user_id'], $this->storeId);
-        $data = array_merge($data, ['store_owner' => $response['message']]);
 
         return parent::handle($data);
     }

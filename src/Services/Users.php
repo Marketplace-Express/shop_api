@@ -15,24 +15,36 @@ class Users extends AbstractService
     const SYNC_QUEUE_NAME = 'users_sync';
     const ASYNC_QUEUE_NAME = 'users_async';
 
-    public function register(array $data)
-    {
+    public function register(
+        $firstName,
+        $lastName,
+        $gender,
+        $birthdate,
+        $password,
+        $email
+    ) {
         return $this->requestSender
             ->setQueueName(self::SYNC_QUEUE_NAME)
             ->setRoute('user/register')
             ->setMethod('post')
-            ->setBody($data)
+            ->setBody([
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'gender' => $gender,
+                'birthdate' => $birthdate,
+                'password' => $password,
+                'email' => $email
+            ])
             ->sendSync();
     }
 
-    public function login(array $data)
+    public function login($userName, $password)
     {
         return $this->requestSender
             ->setQueueName(self::SYNC_QUEUE_NAME)
             ->setRoute('user/login')
             ->setMethod('post')
-            ->setHeaders(['csrf-token' => $data['csrf-token']])
-            ->setBody($data)
+            ->setBody(['user_name' => $userName, 'password' => $password])
             ->sendSync();
     }
 
@@ -173,6 +185,16 @@ class Users extends AbstractService
             ->setRoute(sprintf('role/%s/user', $roleId))
             ->setMethod('delete')
             ->setBody(['user_id' => $userId])
+            ->sendSync();
+    }
+
+    public function getByIds(array $usersIds)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE_NAME)
+            ->setRoute('user/all')
+            ->setMethod('post')
+            ->setBody(['usersIds' => $usersIds])
             ->sendSync();
     }
 }

@@ -63,8 +63,8 @@ class CreateStoreChain extends AbstractChain
         $handlers = new Authenticate($this->requestSender, $this->request, $this->tokenAuthentication);
 
         $handlers
-            ->next(new CreateStore($this->requestSender))
-            ->next(new Logger($this->logger, "new store created"));
+            ->next(new Logger($this->logger, "new store created"))
+            ->next(new CreateStore($this->requestSender));
 
         $this->handlers = $handlers;
 

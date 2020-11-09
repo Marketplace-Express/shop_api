@@ -20,44 +20,41 @@ class Categories extends AbstractService implements ServiceInterface
     const SYNC_QUEUE = 'categories_sync';
     const ASYNC_QUEUE = 'categories_async';
 
-    public function getCategories()
+    public function getCategories(string $query, array $variables = [])
     {
         return $this->requestSender
-            ->setQueueName('categories_sync')
+            ->setQueueName(self::SYNC_QUEUE)
             ->setRoute('categories/fetch')
             ->setMethod('post')
             ->setBody([
-                'variables' => ['storeId' => 'f58031e2-a1bb-11ea-ac38-0242ac120002'],
-                'query' => '{
-    categories {
-        id
-        name
-        children {
-            id
-            name
-            children {
-                id
-                name
-                children {
-                    id
-                    name
-                    order
-                }
-                attributes {
-                    id
-                    name
-                    values
-                }
-            }
-        }
-        attributes {
-            id
-            key
-            name
-            values
-        }
+                'query' => $query,
+                'variables' => $variables
+            ])
+            ->sendSync();
     }
-}'
+
+    public function createCategory(string $mutation, array $variables)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE)
+            ->setRoute('categories/mutate')
+            ->setMethod('post')
+            ->setBody([
+                'query' => $mutation,
+                'variables' => $variables
+            ])
+            ->sendSync();
+    }
+
+    public function updateCategory(string $mutation, array $variables)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE)
+            ->setRoute('categories/mutate')
+            ->setMethod('put')
+            ->setBody([
+                'query' => $mutation,
+                'variables' => $variables
             ])
             ->sendSync();
     }

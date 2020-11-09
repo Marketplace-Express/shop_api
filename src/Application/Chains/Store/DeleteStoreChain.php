@@ -10,7 +10,6 @@ namespace App\Application\Chains\Store;
 
 use App\Application\Chains\AbstractChain;
 use App\Application\Handlers\Logger;
-use App\Application\Handlers\Role\DeleteRole;
 use App\Application\Handlers\Store\DeleteStore;
 use App\Application\Handlers\Store\IsStoreOwner;
 use App\Application\Handlers\User\Authenticate;
@@ -70,8 +69,8 @@ class DeleteStoreChain extends AbstractChain
         $handlers
             ->next(new IsStoreOwner($this->requestSender, $storeId))
             ->next(new Authorize($this->requestSender, $this->request, $this->tokenAuthentication, ['storeId' => $storeId]))
-            ->next(new DeleteStore($this->requestSender))
-            ->next(new Logger($this->logger, "store deleted"));
+            ->next(new Logger($this->logger, "store deleted"))
+            ->next(new DeleteStore($this->requestSender));
 
         $this->handlers = $handlers;
 

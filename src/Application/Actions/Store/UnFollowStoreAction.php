@@ -1,25 +1,26 @@
 <?php
 /**
  * User: Wajdi Jurry
- * Date: 2020/10/30
- * Time: 16:05
+ * Date: 2020/10/31
+ * Time: 10:12
  */
 
 namespace App\Application\Actions\Store;
 
 
 use App\Application\Actions\Action;
-use App\Application\Actions\Permissions;
-use App\Application\Chains\Store\GetFollowersChain;
+use App\Application\Chains\Store\UnFollowStoreChain;
 use App\Utilities\RequestSenderInterface;
+use Fig\Http\Message\StatusCodeInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Log\LoggerInterface;
 
-class GetFollowersAction extends Action
+class UnFollowStoreAction extends Action
 {
     /**
-     * @var GetFollowersChain
+     * @var UnFollowStoreChain
      */
     private $chain;
 
@@ -29,7 +30,7 @@ class GetFollowersAction extends Action
     private $container;
 
     /**
-     * GetFollowersAction constructor.
+     * UnFollowStoreAction constructor.
      * @param ContainerInterface $container
      */
     public function __construct(ContainerInterface $container)
@@ -41,25 +42,23 @@ class GetFollowersAction extends Action
     {
         $requestSender = $this->container->get(RequestSenderInterface::class);
         $tokenAuth = $this->container->get('tokenAuth');
+        $logger = $this->container->get(LoggerInterface::class);
 
-        $this->chain = (new GetFollowersChain($requestSender, $tokenAuth, $request))->initiate();
+        $this->chain = (new UnFollowStoreChain($requestSender, $tokenAuth, $request, $logger))->initiate();
         return parent::__invoke($request, $response, $args);
     }
 
     /**
      * @return Response
-     *
-     * @Permissions(policyModel="Store", grants={"listFollowers"})
      */
     protected function action(): Response
     {
         try {
-            $response = $this->chain->run(
-                array_merge(
-                    $this->request->getQueryParams(),
-                    ['storeId' => $this->request->getAttribute('storeId')]
-                )
+            $this->chain->run(
+                $this->getRequestBody(true)
             );
+
+            $response = ['status' => StatusCodeInterface::STATUS_NO_CONTENT, 'message' => ''];
         } catch (\Throwable $exception) {
             $response = $this->prepareException($exception);
         }

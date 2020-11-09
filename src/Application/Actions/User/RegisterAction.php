@@ -35,6 +35,9 @@ class RegisterAction extends Action
         $this->chainRequest = (new RegisterChain($requestSender, $logger))->initiate();
     }
 
+    /**
+     * @return Response
+     */
     protected function action(): Response
     {
         try {

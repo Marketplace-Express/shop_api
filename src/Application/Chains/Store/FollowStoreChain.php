@@ -63,8 +63,8 @@ class FollowStoreChain extends AbstractChain
 
         $handlers
             ->next(new GetStore($this->requestSender)) // check if store exists
-            ->next(new FollowStore($this->requestSender))
-            ->next(new Logger($this->logger, "user follow store"));
+            ->next(new Logger($this->logger, "user follow store"))
+            ->next(new FollowStore($this->requestSender));
 
         $this->handlers = $handlers;
 

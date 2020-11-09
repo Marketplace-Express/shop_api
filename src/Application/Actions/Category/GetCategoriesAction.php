@@ -1,45 +1,38 @@
 <?php
 /**
  * User: Wajdi Jurry
- * Date: 2020/10/03
- * Time: 15:29
+ * Date: 2020/11/06
+ * Time: 14:00
  */
 
-namespace App\Application\Actions\User;
+namespace App\Application\Actions\Category;
 
 
 use App\Application\Actions\Action;
-use App\Application\Chains\User\LoginChain;
+use App\Application\Chains\Category\GetCategoriesChain;
 use App\Utilities\RequestSenderInterface;
 use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Log\LoggerInterface;
 
-class LoginAction extends Action
+class GetCategoriesAction extends Action
 {
-    /**
-     * @var bool
-     */
-    protected $forceLogUsage = true;
-
     /**
      * @var RequestSenderInterface
      */
     private $requestSender;
 
     /**
-     * @var LoginChain
+     * @var GetCategoriesChain
      */
     private $chain;
 
     /**
-     * LoginAction constructor.
-     * @param LoggerInterface $logger
+     * GetCategoriesAction constructor.
      * @param RequestSenderInterface $requestSender
      */
-    public function __construct(LoggerInterface $logger, RequestSenderInterface $requestSender)
+    public function __construct(RequestSenderInterface $requestSender)
     {
         $this->requestSender = $requestSender;
-        $this->chain = (new LoginChain($requestSender, $logger))->initiate();
+        $this->chain = (new GetCategoriesChain($requestSender))->initiate();
     }
 
     /**
@@ -49,7 +42,9 @@ class LoginAction extends Action
     {
         try {
             $response = $this->chain->run(
-                $this->getRequestBody(true)
+                array_merge($this->getRequestBody(true), [
+                    'storeId' => $this->request->getHeaderLine('storeId')
+                ])
             );
         } catch (\Throwable $exception) {
             $response = $this->prepareException($exception);

@@ -74,8 +74,8 @@ class CreateRoleChain extends AbstractChain
             ->next(new IsStoreOwner($this->requestSender, $storeId))
             ->next(new Authorize($this->requestSender, $this->request, $this->tokenAuthentication, ['storeId' => $storeId]))
             ->next(new GetStore($this->requestSender)) // check if store exists
-            ->next(new CreateRole($this->requestSender))
-            ->next(new Logger($this->logger, "new role created"));
+            ->next(new Logger($this->logger, "new role created"))
+            ->next(new CreateRole($this->requestSender));
 
         $this->handlers = $handlers;
 

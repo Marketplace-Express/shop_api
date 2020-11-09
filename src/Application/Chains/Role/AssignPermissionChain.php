@@ -69,8 +69,8 @@ class AssignPermissionChain extends AbstractChain
         $handlers
             ->next(new IsStoreOwner($this->requestSender, $storeId))
             ->next(new Authorize($this->requestSender, $this->request, $this->tokenAuthentication, ['storeId' => $storeId]))
-            ->next(new AssignPermission($this->requestSender))
-            ->next(new Logger($this->logger, "permission assigned to role"));
+            ->next(new Logger($this->logger, "permission assigned to role"))
+            ->next(new AssignPermission($this->requestSender));
 
         $this->handlers = $handlers;
 

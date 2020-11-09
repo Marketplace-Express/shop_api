@@ -12,7 +12,7 @@ use App\Application\Chains\AbstractChain;
 use App\Application\Handlers\Store\IsStoreOwner;
 use App\Application\Handlers\User\Authenticate;
 use App\Application\Handlers\User\Authorize;
-use App\Application\Handlers\User\Ban;
+use App\Application\Handlers\User\BanUser;
 use App\Application\Handlers\Logger;
 use App\Utilities\RequestSenderInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -67,8 +67,8 @@ class BanChain extends AbstractChain
         $handlers
             ->next(new IsStoreOwner($this->requestSender, $this->request->getHeaderLine('storeId')))
             ->next(new Authorize($this->requestSender, $this->request, $this->tokenAuthentication))
-            ->next(new Ban($this->requestSender))
-            ->next(new Logger($this->logger, "User banned"));
+            ->next(new Logger($this->logger, "user banned"))
+            ->next(new BanUser($this->requestSender));
 
         $this->handlers = $handlers;
 

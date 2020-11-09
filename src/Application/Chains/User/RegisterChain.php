@@ -42,8 +42,15 @@ class RegisterChain extends AbstractChain
      */
     public function initiate()
     {
-        $handlers = new Register($this->requestSender);
-        $handlers->next(new Logger($this->logger, "New user registered"));
+        $data['first_name'] = $data['first_name'] ?? null;
+        $data['last_name'] = $data['last_name'] ?? null;
+        $data['gender'] = $data['gender'] ?? null;
+        $data['birthdate'] = $data['birthdate'] ?? null;
+        $data['password'] = $data['password'] ?? null;
+        $data['email'] = $data['email'] ?? null;
+
+        $handlers = new Logger($this->logger, "New user registered");
+        $handlers->next(new Register($this->requestSender));
 
         $this->handlers = $handlers;
 

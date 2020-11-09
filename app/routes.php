@@ -66,6 +66,13 @@ return function (App $app) {
         $group->get('/{storeId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}/followers',
             Actions\Store\GetFollowersAction::class);
 
+        $group->get('/followed', Actions\Store\GetFollowedStoresAction::class);
 
+        $group->delete('/unfollow', Actions\Store\UnFollowStoreAction::class);
+    });
+
+    $app->group('/api/categories', function (Group $group) {
+        $group->post('/fetch', Actions\Category\GetCategoriesAction::class);
+        $group->post('/mutate', Actions\Category\CreateCategoryAction::class);
     });
 };

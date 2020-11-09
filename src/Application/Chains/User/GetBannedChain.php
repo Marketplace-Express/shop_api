@@ -13,7 +13,7 @@ use App\Application\Handlers\Logger;
 use App\Application\Handlers\Store\IsStoreOwner;
 use App\Application\Handlers\User\Authenticate;
 use App\Application\Handlers\User\Authorize;
-use App\Application\Handlers\User\GetBanned;
+use App\Application\Handlers\User\GetBannedUsers;
 use App\Utilities\RequestSenderInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -63,12 +63,12 @@ class GetBannedChain extends AbstractChain
     public function initiate()
     {
         $handlers = new Authenticate($this->requestSender, $this->request, $this->tokenAuthentication);
-
         $handlers
             ->next(new IsStoreOwner($this->requestSender, $this->request->getHeaderLine('storeId')))
             ->next(new Authorize($this->requestSender, $this->request, $this->tokenAuthentication))
-            ->next(new GetBanned($this->requestSender))
-            ->next(new Logger($this->logger, "get banned users"));
+            ->next(new Logger($this->logger, 'get banned users'))
+            ->next(new GetBannedUsers($this->requestSender));
+
 
         $this->handlers = $handlers;
 

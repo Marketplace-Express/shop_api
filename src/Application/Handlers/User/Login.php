@@ -29,8 +29,15 @@ class Login extends AbstractHandler
      */
     public function handle(array $data = [])
     {
-        $response = $this->requestSender->services->users->login($data);
+        $data['user_name'] = $data['user_name'] ?? null;
+        $data['password'] = $data['password'] ?? null;
 
-        return parent::handle($response);
+        $response = $this->requestSender->services->users->login($data['user_name'], $data['password']);
+
+        if ($this->next) {
+            return parent::handle($response);
+        }
+
+        return $response;
     }
 }

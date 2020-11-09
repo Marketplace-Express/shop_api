@@ -42,8 +42,8 @@ class LoginChain extends AbstractChain
      */
     public function initiate()
     {
-        $handlers = new Login($this->requestSender);
-        $handlers->next(new Logger($this->logger, "New user login"));
+        $handlers = new Logger($this->logger, "new user login");
+        $handlers->next(new Login($this->requestSender));
 
         $this->handlers = $handlers;
 

@@ -101,6 +101,11 @@ class ThrottleService
      */
     public function addTry(string $ip, string $action)
     {
+        if (!array_key_exists($action, $this->throttleSettings)) {
+            // Do not log throttle action if setting is not defined
+            return;
+        }
+
         $key = $this->keyBuilder($ip);
 
         $setExpiry = !$this->connector->redis->exists($key);

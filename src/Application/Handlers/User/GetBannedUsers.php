@@ -11,7 +11,7 @@ namespace App\Application\Handlers\User;
 use App\Application\Handlers\AbstractHandler;
 use App\Utilities\RequestSenderInterface;
 
-class GetBanned extends AbstractHandler
+class GetBannedUsers extends AbstractHandler
 {
     /**
      * @var RequestSenderInterface
@@ -29,6 +29,16 @@ class GetBanned extends AbstractHandler
 
     public function handle(array $data = [])
     {
-        return $this->requestSender->services->users->getBanned($data['page'], $data['limit']);
+        $data['page'] = $data['page'] ?? null;
+        $data['limit'] = $data['limit'] ?? null;
+
+        $response = $this->requestSender->services->users->getBanned($data['page'], $data['limit']);
+        $data['users'] = $response['message'];
+
+        if ($this->next) {
+            return parent::handle($data);
+        }
+
+        return $response;
     }
 }

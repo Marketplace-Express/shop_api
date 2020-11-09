@@ -69,8 +69,8 @@ class DeleteRoleChain extends AbstractChain
         $handlers
             ->next(new IsStoreOwner($this->requestSender, $storeId))
             ->next(new Authorize($this->requestSender, $this->request, $this->tokenAuthentication, ['storeId' => $storeId]))
-            ->next(new DeleteRole($this->requestSender))
-            ->next(new Logger($this->logger, "role deleted"));
+            ->next(new Logger($this->logger, "role deleted"))
+            ->next(new DeleteRole($this->requestSender));
 
         $this->handlers = $handlers;
 

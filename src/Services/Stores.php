@@ -78,11 +78,31 @@ class Stores extends AbstractService
             ->sendSync();
     }
 
+    public function unfollow(string $userId, $storeId)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE_NAME)
+            ->setRoute('follow/unfollow')
+            ->setMethod('delete')
+            ->setBody(['storeId' => $storeId, 'followerId' => $userId])
+            ->sendSync();
+    }
+
     public function getFollowers(string $storeId, $page, $limit)
     {
         return $this->requestSender
             ->setQueueName(self::SYNC_QUEUE_NAME)
             ->setRoute(sprintf('follow/%s/followers', $storeId))
+            ->setMethod('get')
+            ->setQuery(['page' => $page, 'limit' => $limit])
+            ->sendSync();
+    }
+
+    public function getFollowed(string $userId, $page, $limit)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE_NAME)
+            ->setRoute(sprintf('follow/%s/followed', $userId))
             ->setMethod('get')
             ->setQuery(['page' => $page, 'limit' => $limit])
             ->sendSync();
