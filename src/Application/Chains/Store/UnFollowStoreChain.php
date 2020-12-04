@@ -63,7 +63,7 @@ class UnFollowStoreChain extends AbstractChain
         $handlers = new Authenticate($this->requestSender, $this->request, $this->tokenAuthentication);
         $handlers
             ->next(new UnFollowStore($this->requestSender))
-            ->next(new Logger($this->logger, 'user unfollow store'));
+            ->next(new Logger($this->logger, 'user unfollow store', ['user_id', 'storeId']));
 
         $this->handlers = $handlers;
 

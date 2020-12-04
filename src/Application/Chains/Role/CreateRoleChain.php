@@ -10,6 +10,7 @@ namespace App\Application\Chains\Role;
 
 use App\Application\Chains\AbstractChain;
 use App\Application\Handlers\Logger;
+use App\Application\Handlers\ReturnData;
 use App\Application\Handlers\Role\CreateRole;
 use App\Application\Handlers\Store\GetStore;
 use App\Application\Handlers\Store\IsStoreOwner;
@@ -74,8 +75,9 @@ class CreateRoleChain extends AbstractChain
             ->next(new IsStoreOwner($this->requestSender, $storeId))
             ->next(new Authorize($this->requestSender, $this->request, $this->tokenAuthentication, ['storeId' => $storeId]))
             ->next(new GetStore($this->requestSender)) // check if store exists
-            ->next(new Logger($this->logger, "new role created"))
-            ->next(new CreateRole($this->requestSender));
+            ->next(new CreateRole($this->requestSender))
+            ->next(new Logger($this->logger, "new role created", ['storeId', 'role_id', 'user_id']))
+            ->next(new ReturnData("role"));
 
         $this->handlers = $handlers;
 

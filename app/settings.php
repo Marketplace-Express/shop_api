@@ -16,7 +16,7 @@ return function (ContainerBuilder $containerBuilder) {
             ],
             'api_throttle' => [
                 'Actions\User\RegisterAction' => [
-                    3600 => 1, // per hour
+                    3600 => 2, // per hour
                     86400 => 2, // per day
                 ],
                 'Actions\User\LoginAction' => [

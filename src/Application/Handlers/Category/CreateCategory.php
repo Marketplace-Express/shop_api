@@ -27,13 +27,13 @@ class CreateCategory extends AbstractGraphQLHandler
         $data['userId'] = $data['user']['user_id'];
         $data['selections'] = $data['selections'] ?? $this->defaultSelections;
 
-        $this->variables = [
+        $variables = [
             'storeId' => $data['storeId'],
             'userId' => $data['userId'],
             'category' => $data['category']
         ];
 
-        [$queryVariables, $queryArguments] = $this->appendQueryInputs();
+        [$queryVariables, $queryArguments] = $this->appendQueryVariables();
 
         $mutation = new Mutation('create');
         $mutation
@@ -43,7 +43,7 @@ class CreateCategory extends AbstractGraphQLHandler
 
         $this->buildSelections($mutation, $data['selections']);
 
-        $response = $this->requestSender->services->categories->createCategory($mutation, $this->variables);
+        $response = $this->requestSender->services->categories->createCategory($mutation, $variables);
         $data['category'] = $response['message'];
 
         if ($this->next) {
@@ -56,7 +56,7 @@ class CreateCategory extends AbstractGraphQLHandler
     /**
      * @return array[]
      */
-    protected function appendQueryInputs(): array
+    protected function appendQueryVariables(): array
     {
         $queryVariables = $queryArguments = [];
         foreach (['category' => 'Create', 'storeId' => 'Uuid', 'userId' => 'Uuid'] as $variable => $type) {

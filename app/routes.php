@@ -74,5 +74,17 @@ return function (App $app) {
     $app->group('/api/categories', function (Group $group) {
         $group->post('/fetch', Actions\Category\GetCategoriesAction::class);
         $group->post('/mutate', Actions\Category\CreateCategoryAction::class);
+        $group->put('/mutate', Actions\Category\UpdateCategoryAction::class);
+        $group->delete('/mutate', Actions\Category\DeleteCategoryAction::class);
+    });
+
+    $app->group('/api/products', function (Group $group) {
+        $group->get('/owner', Actions\Product\GetProductsForAdminAction::class);
+        $group->get('/{productId}', Actions\Product\GetProductAction::class);
+        $group->get('/owner/{productId}', Actions\Product\GetProductForAdminAction::class);
+        $group->get('', Actions\Product\GetProductsAction::class);
+        $group->post('', Actions\Product\CreateProductAction::class);
+        $group->put('/{productId}', Actions\Product\UpdateProductAction::class);
+        $group->delete('/{productId}', Actions\Product\DeleteProductAction::class);
     });
 };

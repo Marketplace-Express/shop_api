@@ -9,7 +9,6 @@ namespace App\Application\Handlers\Category;
 
 
 use Fig\Http\Message\StatusCodeInterface;
-use GraphQL\Graph;
 use GraphQL\Query;
 use GraphQL\Variable;
 
@@ -24,12 +23,12 @@ class GetCategories extends AbstractGraphQLHandler
         }
 
         // Set query variables
-        $this->variables = ['storeId' => $data['storeId']];
+        $variables = ['storeId' => $data['storeId']];
         foreach ($data['categories_ids'] as $key => $categoryId) {
-            $this->variables['id'.$key] = $categoryId;
+            $variables['id'.$key] = $categoryId;
         }
 
-        [$queryVariables, $queryArguments] = $this->appendQueryInputs($data['categories_ids']);
+        [$queryVariables, $queryArguments] = $this->appendQueryVariables($data['categories_ids']);
 
         // Generate GraphQL query
         $query = (new Query('categories'))
@@ -40,7 +39,7 @@ class GetCategories extends AbstractGraphQLHandler
 
         $this->buildSelections($query, $data['selections']);
 
-        $response = $this->requestSender->services->categories->getCategories($query, $this->variables);
+        $response = $this->requestSender->services->categories->getCategories($query, $variables);
         $data['categories'] = $response['message'];
 
         if ($this->next) {
@@ -54,7 +53,7 @@ class GetCategories extends AbstractGraphQLHandler
      * @param array $inputs
      * @return array[]
      */
-    protected function appendQueryInputs(array $inputs = []): array
+    protected function appendQueryVariables(array $inputs = []): array
     {
         $queryVariables = $queryArguments = [];
         foreach ($inputs as $key => $categoryId) {

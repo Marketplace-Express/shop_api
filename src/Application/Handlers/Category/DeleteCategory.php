@@ -1,8 +1,8 @@
 <?php
 /**
  * User: Wajdi Jurry
- * Date: 2020/11/07
- * Time: 18:02
+ * Date: 2020/11/10
+ * Time: 13:19
  */
 
 namespace App\Application\Handlers\Category;
@@ -12,7 +12,7 @@ use Fig\Http\Message\StatusCodeInterface;
 use GraphQL\Mutation;
 use GraphQL\Variable;
 
-class UpdateCategory extends AbstractGraphQLHandler
+class DeleteCategory extends AbstractGraphQLHandler
 {
     public function handle(array $data = [])
     {
@@ -25,45 +25,30 @@ class UpdateCategory extends AbstractGraphQLHandler
         }
 
         $data['userId'] = $data['user']['user_id'];
-        $data['selections'] = $data['selections'] ?? $this->defaultSelections;
 
         $variables = [
             'storeId' => $data['storeId'],
-            'userId' => $data['userId'],
             'category' => $data['category']
         ];
 
         [$queryVariables, $queryArguments] = $this->appendQueryVariables();
 
-        $mutation = new Mutation('update');
+        $mutation = new Mutation('delete');
         $mutation
             ->setVariables($queryVariables)
             ->setArguments($queryArguments)
             ->setOperationName('Mutate');
 
-        $this->buildSelections($mutation, $data['selections']);
+        $this->requestSender->services->categories->deleteCategory($mutation, $variables);
 
-        $response = $this->requestSender->services->categories->updateCategory($mutation, $variables);
-        $data['category'] = $response['message'];
-
-        if ($this->next) {
-            return parent::handle($data);
-        }
-
-        return $response;
+        return parent::handle($data);
     }
 
-    /**
-     * @return array[]
-     */
     protected function appendQueryVariables(): array
     {
-        $queryVariables = $queryArguments = [];
-        foreach (['category' => 'Update', 'storeId' => 'Uuid', 'userId' => 'Uuid'] as $variable => $type) {
-            $queryVariables[$variable] = new Variable($variable, $type, true);
-            $queryArguments[$variable] = '$' . $variable;
-        }
-
-        return [$queryVariables, $queryArguments];
+        return [
+            [new Variable('category', 'Delete', true)],
+            ['category' => '$category']
+        ];
     }
 }

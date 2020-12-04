@@ -1,18 +1,18 @@
 <?php
 /**
  * User: Wajdi Jurry
- * Date: 2020/10/23
- * Time: 13:25
+ * Date: 2020/11/27
+ * Time: 18:10
  */
 
-namespace App\Application\Handlers\Role;
+namespace App\Application\Handlers\Product;
 
 
 use App\Application\Handlers\AbstractHandler;
 use App\Utilities\RequestSenderInterface;
 use Fig\Http\Message\StatusCodeInterface;
 
-class CreateRole extends AbstractHandler
+class UpdateProduct extends AbstractHandler
 {
     /**
      * @var RequestSenderInterface
@@ -20,7 +20,7 @@ class CreateRole extends AbstractHandler
     private $requestSender;
 
     /**
-     * CreateRole constructor.
+     * UpdateProduct constructor.
      * @param RequestSenderInterface $requestSender
      */
     public function __construct(RequestSenderInterface $requestSender)
@@ -30,12 +30,11 @@ class CreateRole extends AbstractHandler
 
     public function handle(array $data = [])
     {
-        if (empty($data['role_name']) || empty($data['storeId'])) {
-            throw new \InvalidArgumentException('role name or store id not provided', StatusCodeInterface::STATUS_BAD_REQUEST);
-        }
+        $productId = $data['productId'];
+        unset($data['productId']);
 
-        $response = $this->requestSender->services->users->createRole($data['role_name'], $data['storeId']);
-        $data['role'] = $response['message'];
+        $response = $this->requestSender->services->products->update($productId, $data);
+        $data['product'] = $response['message'];
 
         if ($this->next) {
             return parent::handle($data);

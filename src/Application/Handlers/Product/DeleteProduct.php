@@ -1,17 +1,17 @@
 <?php
 /**
  * User: Wajdi Jurry
- * Date: 2020/09/29
- * Time: 01:06
+ * Date: 2020/11/27
+ * Time: 18:21
  */
 
-namespace App\Application\Handlers\User;
+namespace App\Application\Handlers\Product;
 
 
 use App\Application\Handlers\AbstractHandler;
 use App\Utilities\RequestSenderInterface;
 
-class Register extends AbstractHandler
+class DeleteProduct extends AbstractHandler
 {
     /**
      * @var RequestSenderInterface
@@ -19,7 +19,7 @@ class Register extends AbstractHandler
     private $requestSender;
 
     /**
-     * AbstractHandler constructor.
+     * DeleteProduct constructor.
      * @param RequestSenderInterface $requestSender
      */
     public function __construct(RequestSenderInterface $requestSender)
@@ -29,12 +29,8 @@ class Register extends AbstractHandler
 
     public function handle(array $data = [])
     {
-        $response = $this->requestSender->services->users->register($data);
+        $this->requestSender->services->products->delete($data['productId']);
 
-        if ($this->next) {
-            return parent::handle($response);
-        }
-
-        return $response;
+        return parent::handle($data);
     }
 }

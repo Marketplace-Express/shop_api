@@ -15,26 +15,12 @@ class Users extends AbstractService
     const SYNC_QUEUE_NAME = 'users_sync';
     const ASYNC_QUEUE_NAME = 'users_async';
 
-    public function register(
-        $firstName,
-        $lastName,
-        $gender,
-        $birthdate,
-        $password,
-        $email
-    ) {
+    public function register(array $data) {
         return $this->requestSender
             ->setQueueName(self::SYNC_QUEUE_NAME)
             ->setRoute('user/register')
             ->setMethod('post')
-            ->setBody([
-                'first_name' => $firstName,
-                'last_name' => $lastName,
-                'gender' => $gender,
-                'birthdate' => $birthdate,
-                'password' => $password,
-                'email' => $email
-            ])
+            ->setBody($data)
             ->sendSync();
     }
 

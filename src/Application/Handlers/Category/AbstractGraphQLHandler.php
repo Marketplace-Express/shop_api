@@ -28,11 +28,6 @@ abstract class AbstractGraphQLHandler extends AbstractHandler
     ];
 
     /**
-     * @var array
-     */
-    protected $variables = [];
-
-    /**
      * @var RequestSenderInterface
      */
     protected $requestSender;
@@ -51,15 +46,11 @@ abstract class AbstractGraphQLHandler extends AbstractHandler
      * @param array $data
      * @return Query
      */
-    protected function buildSelections(Query $query, array &$data = [])
+    protected function buildSelections(Query $query, array $data = [])
     {
         $selectionSet = [];
         foreach ($data as $field => $value) {
-            if (is_array($value)) {
-                $selectionSet[] = $this->buildSelections(new Query($field), $data[$field]);
-            } else {
-                $selectionSet[] = $value;
-            }
+            $selectionSet[] = (is_array($value)) ? $this->buildSelections(new Query($field), $value) : $value;
         }
 
         $query->setSelectionSet($selectionSet);
@@ -67,5 +58,5 @@ abstract class AbstractGraphQLHandler extends AbstractHandler
         return $query;
     }
 
-    abstract protected function appendQueryInputs(): array;
+    abstract protected function appendQueryVariables(): array;
 }

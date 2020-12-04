@@ -44,6 +44,12 @@ class CreateStore extends AbstractHandler
             $data['coverPhoto']
         );
 
-        return parent::handle($response);
+        $data['store'] = $response['message'];
+
+        if ($this->next) {
+            return parent::handle($data);
+        }
+
+        return $response;
     }
 }

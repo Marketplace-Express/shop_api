@@ -34,6 +34,13 @@ class UpdateRole extends AbstractHandler
             throw new \InvalidArgumentException('role id or role name not provided', StatusCodeInterface::STATUS_BAD_REQUEST);
         }
 
-        return $this->requestSender->services->users->updateRole($data['role_id'], $data['role_name']);
+        $response = $this->requestSender->services->users->updateRole($data['role_id'], $data['role_name']);
+        $data['role'] = $response['message'];
+
+        if ($this->next) {
+            return parent::handle($data);
+        }
+
+        return $response;
     }
 }

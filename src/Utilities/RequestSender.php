@@ -141,11 +141,6 @@ class RequestSender implements RequestSenderInterface
         return $this;
     }
 
-    private function validate()
-    {
-        return true;
-    }
-
     /**
      * Initialize consumer for Sync requests
      * @throws \Exception
@@ -200,9 +195,6 @@ class RequestSender implements RequestSenderInterface
     {
         $this->requestType = self::REQUEST_TYPE_SYNC;
 
-        // validate request
-        $this->validate();
-
         list($this->replyTo, ,) = $this->channel->queue_declare('', false, true, true, true);
 
         $this->initializeConsumer();
@@ -233,9 +225,6 @@ class RequestSender implements RequestSenderInterface
     public function sendAsync()
     {
         $this->requestType = self::REQUEST_TYPE_ASYNC;
-
-        // validate request
-        $this->validate();
 
         $message = new AMQPMessage(json_encode([
             'route' => $this->route,

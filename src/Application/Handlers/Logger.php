@@ -25,27 +25,33 @@ class Logger extends AbstractHandler
     /**
      * @var string
      */
-    private $dataKey;
+    private $printable;
 
     /**
      * Logger constructor.
      * @param LoggerInterface $logger
      * @param string $message
-     * @param $dataKey
+     * @param $printable
      */
-    public function __construct(LoggerInterface $logger, string $message, $dataKey = null)
+    public function __construct(LoggerInterface $logger, string $message, array $printable = [])
     {
         $this->logger = $logger;
         $this->message = $message;
-        $this->dataKey = $dataKey;
+        $this->printable = $printable;
     }
 
     public function handle(array $data = [])
     {
         $this->logger->info($this->message);
 
-        if ($this->dataKey) {
-            $this->logger->info(json_encode($data[$this->dataKey]));
+        if ($this->printable) {
+            $printable = $this->printable; $toBePrinted = [];
+            array_walk_recursive($data, function ($value, $key) use ($printable, &$toBePrinted) {
+                if (in_array($key, $printable)) {
+                    $toBePrinted[$key] = $value;
+                }
+            });
+            $this->logger->info(json_encode($toBePrinted));
         }
 
         return parent::handle($data);

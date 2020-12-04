@@ -9,7 +9,6 @@ namespace App\Application\Chains\User;
 
 
 use App\Application\Chains\AbstractChain;
-use App\Application\Handlers\Logger;
 use App\Application\Handlers\Store\IsStoreOwner;
 use App\Application\Handlers\User\Authenticate;
 use App\Application\Handlers\User\Authorize;
@@ -66,7 +65,6 @@ class GetBannedChain extends AbstractChain
         $handlers
             ->next(new IsStoreOwner($this->requestSender, $this->request->getHeaderLine('storeId')))
             ->next(new Authorize($this->requestSender, $this->request, $this->tokenAuthentication))
-            ->next(new Logger($this->logger, 'get banned users'))
             ->next(new GetBannedUsers($this->requestSender));
 
 

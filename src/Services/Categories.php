@@ -58,4 +58,17 @@ class Categories extends AbstractService implements ServiceInterface
             ])
             ->sendSync();
     }
+
+    public function deleteCategory(string $query, array $variables)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE)
+            ->setRoute('categories/mutate')
+            ->setMethod('delete')
+            ->setBody([
+                'query' => $query,
+                'variables' => $variables
+            ])
+            ->sendSync();
+    }
 }

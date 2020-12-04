@@ -10,6 +10,7 @@ namespace App\Application\Chains\Store;
 
 use App\Application\Chains\AbstractChain;
 use App\Application\Handlers\Logger;
+use App\Application\Handlers\ReturnData;
 use App\Application\Handlers\Store\CreateStore;
 use App\Application\Handlers\User\Authenticate;
 use App\Utilities\RequestSenderInterface;
@@ -63,8 +64,9 @@ class CreateStoreChain extends AbstractChain
         $handlers = new Authenticate($this->requestSender, $this->request, $this->tokenAuthentication);
 
         $handlers
+            ->next(new CreateStore($this->requestSender))
             ->next(new Logger($this->logger, "new store created"))
-            ->next(new CreateStore($this->requestSender));
+            ->next(new ReturnData("store"));
 
         $this->handlers = $handlers;
 
