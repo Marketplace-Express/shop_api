@@ -10,10 +10,9 @@ namespace App\Application\Chains\Category;
 
 use App\Application\Chains\AbstractChain;
 use App\Application\Handlers\Category\CreateCategory;
-use App\Application\Handlers\Store\GetStore;
 use App\Application\Handlers\Store\IsStoreOwner;
-use App\Application\Handlers\User\Authenticate;
-use App\Application\Handlers\User\Authorize;
+use App\Application\Handlers\User\User\Authenticate;
+use App\Application\Handlers\User\User\Authorize;
 use App\Utilities\RequestSenderInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Middleware\TokenAuthentication;

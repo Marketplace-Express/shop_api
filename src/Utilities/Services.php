@@ -21,7 +21,7 @@ use App\Services\Stores;
 class Services
 {
     /**
-     * @var \App\Utilities\ServiceInterface[]
+     * @var \App\Utilities\AbstractService[]
      */
     private $services = [];
 

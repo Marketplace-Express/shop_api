@@ -9,13 +9,12 @@ namespace App\Services;
 
 
 use App\Utilities\AbstractService;
-use App\Utilities\ServiceInterface;
 
 /**
  * Class Products
  * @package App\Utilities\Services\Products
  */
-class Products extends AbstractService implements ServiceInterface
+class Products extends AbstractService
 {
     const SYNC_QUEUE_NAME = 'products_sync';
     const ASYNC_QUEUE_NAME = 'products_async';
@@ -86,6 +85,45 @@ class Products extends AbstractService implements ServiceInterface
         return $this->requestSender
             ->setQueueName(self::SYNC_QUEUE_NAME)
             ->setRoute(sprintf('products/%s', $productId))
+            ->setMethod('delete')
+            ->sendSync();
+    }
+
+    public function updateQuantity(string $productId, array $data)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE_NAME)
+            ->setRoute(sprintf('products/%s/quantity', $productId))
+            ->setMethod('put')
+            ->setBody($data)
+            ->sendSync();
+    }
+
+    public function createVariation(array $data)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE_NAME)
+            ->setRoute('variations')
+            ->setMethod('post')
+            ->setBody($data)
+            ->sendSync();
+    }
+
+    public function updateVariation(string $variationId, array $data)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE_NAME)
+            ->setRoute(sprintf('variations/%s', $variationId))
+            ->setMethod('put')
+            ->setBody($data)
+            ->sendSync();
+    }
+
+    public function deleteVariation(string $variationId)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE_NAME)
+            ->setRoute(sprintf('variations/%s', $variationId))
             ->setMethod('delete')
             ->sendSync();
     }

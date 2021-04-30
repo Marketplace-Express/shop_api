@@ -10,7 +10,7 @@ namespace App\Application\Chains\Store;
 
 use App\Application\Chains\AbstractChain;
 use App\Application\Handlers\Store\GetFollowedStores;
-use App\Application\Handlers\User\Authenticate;
+use App\Application\Handlers\User\User\Authenticate;
 use App\Utilities\RequestSenderInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Middleware\TokenAuthentication;

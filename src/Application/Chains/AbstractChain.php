@@ -19,7 +19,7 @@ abstract class AbstractChain
      * @param array $data
      * @return array|mixed
      */
-    public function run(array $data)
+    public function run(array $data = [])
     {
         return $this->handlers->handle($data);
     }

@@ -11,7 +11,7 @@ namespace App\Application\Chains\Store;
 use App\Application\Chains\AbstractChain;
 use App\Application\Handlers\Logger;
 use App\Application\Handlers\Store\UnFollowStore;
-use App\Application\Handlers\User\Authenticate;
+use App\Application\Handlers\User\User\Authenticate;
 use App\Utilities\RequestSenderInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;

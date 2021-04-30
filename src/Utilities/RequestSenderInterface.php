@@ -54,5 +54,10 @@ interface RequestSenderInterface
      */
     public function sendSync();
 
+    /**
+     * Send async request to another endpoint
+     *
+     * @return mixed
+     */
     public function sendAsync();
 }

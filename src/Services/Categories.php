@@ -9,13 +9,12 @@ namespace App\Services;
 
 
 use App\Utilities\AbstractService;
-use App\Utilities\ServiceInterface;
 
 /**
  * Class Categories
  * @package App\Utilities\Services
  */
-class Categories extends AbstractService implements ServiceInterface
+class Categories extends AbstractService
 {
     const SYNC_QUEUE = 'categories_sync';
     const ASYNC_QUEUE = 'categories_async';

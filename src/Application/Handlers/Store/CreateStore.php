@@ -30,19 +30,13 @@ class CreateStore extends AbstractHandler
 
     public function handle(array $data = [])
     {
-        if (empty($data['user']) || empty($data['user']['user_id'])) {
-            throw new \InvalidArgumentException('user id not provided', StatusCodeInterface::STATUS_BAD_REQUEST);
+        if (empty($data['user'])) {
+            throw new \InvalidArgumentException('user data not provided', StatusCodeInterface::STATUS_BAD_REQUEST);
         }
 
-        $response = $this->requestSender->services->stores->create(
-            $data['user']['user_id'],
-            $data['name'],
-            $data['description'],
-            $data['type'],
-            $data['location'],
-            $data['photo'],
-            $data['coverPhoto']
-        );
+        $data['ownerId'] = $data['user']['user_id'];
+
+        $response = $this->requestSender->services->stores->create($data);
 
         $data['store'] = $response['message'];
 

@@ -14,6 +14,9 @@ use Fig\Http\Message\StatusCodeInterface;
 
 class GetFollowedStores extends AbstractHandler
 {
+    const DEFAULT_PAGE = 1;
+    const DEFAULT_LIMIT = 10;
+
     /**
      * @var RequestSenderInterface
      */
@@ -34,11 +37,11 @@ class GetFollowedStores extends AbstractHandler
             throw new \InvalidArgumentException('user data not provided', StatusCodeInterface::STATUS_BAD_REQUEST);
         }
 
-        $data['page'] = $data['page'] ?? null;
-        $data['limit'] = $data['limit'] ?? null;
+        $data['page'] = $data['page'] ?? self::DEFAULT_PAGE;
+        $data['limit'] = $data['limit'] ?? self::DEFAULT_LIMIT;
 
         $response = $this->requestSender->services->stores->getFollowed($data['user']['user_id'], $data['page'], $data['limit']);
-        $data = array_merge($data, ['followed_stores' => $response['message']]);
+        $data['followed_stores'] = $response['message'];
 
         if ($this->next) {
             return parent::handle($data);

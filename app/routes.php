@@ -15,59 +15,31 @@ return function (App $app) {
     });
 
     $app->group('/api/users', function (Group $group) {
-        $group->post('', Actions\User\RegisterAction::class);
-
-        $group->post('/login', Actions\User\LoginAction::class);
-
-        $group->post(
-            '/ban/{userId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}',
-            Actions\User\BanAction::class);
-
-        $group->post('/unBan/{userId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}',
-            Actions\User\UnBanAction::class);
-
-        $group->get('/banned', Actions\User\GetBannedAction::class);
+        $group->post('', Actions\User\User\RegisterAction::class);
+        $group->post('/login', Actions\User\User\LoginAction::class);
+        $group->post('/ban/{userId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}', Actions\User\User\BanAction::class);
+        $group->post('/unBan/{userId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}', Actions\User\User\UnBanAction::class);
+        $group->get('/banned', Actions\User\User\GetBannedAction::class);
+        $group->get('/profile', Actions\User\User\ProfileAction::class);
     });
 
     $app->group('/api/roles', function (Group $group) {
-        $group->get('/{roleId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}',
-            Actions\Role\GetRoleAction::class);
-
-        $group->post('', Actions\Role\CreateRoleAction::class);
-
-        $group->delete('/{roleId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}',
-            Actions\Role\DeleteRoleAction::class);
-
-        $group->put('/{roleId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}',
-            Actions\Role\UpdateRoleAction::class);
-
-        $group->put('/{roleId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}/permission',
-            Actions\Role\AssignPermissionAction::class);
-
-        $group->delete('/{roleId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}/permission',
-            Actions\Role\UnAssignPermissionAction::class);
-
-        $group->post('/{roleId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}/user',
-            Actions\Role\AssignRoleAction::class);
-
-        $group->delete('/{roleId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}/user',
-            Actions\Role\UnAssignRoleAction::class);
+        $group->get('/{roleId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}', Actions\User\Role\GetRoleAction::class);
+        $group->post('', Actions\User\Role\CreateRoleAction::class);
+        $group->delete('/{roleId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}', Actions\User\Role\DeleteRoleAction::class);
+        $group->put('/{roleId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}', Actions\User\Role\UpdateRoleAction::class);
+        $group->put('/{roleId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}/permission', Actions\User\Role\AssignPermissionAction::class);
+        $group->delete('/{roleId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}/permission', Actions\User\Role\UnAssignPermissionAction::class);
+        $group->post('/{roleId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}/user', Actions\User\Role\AssignRoleAction::class);
+        $group->delete('/{roleId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}/user', Actions\User\Role\UnAssignRoleAction::class);
     });
 
     $app->group('/api/stores', function (Group $group) {
         $group->post('', Actions\Store\CreateStoreAction::class);
-
-        $group->delete('/{storeId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}',
-            Actions\Store\DeleteStoreAction::class);
-
-        $group->post('/follow/{storeId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}',
-            Actions\Store\FollowStoreAction::class);
-
-        $group->get('/{storeId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}/followers',
-            Actions\Store\GetFollowersAction::class);
-
+        $group->delete('/{storeId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}', Actions\Store\DeleteStoreAction::class);
+        $group->post('/follow/{storeId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}', Actions\Store\FollowStoreAction::class);
+        $group->get('/{storeId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}/followers', Actions\Store\GetFollowersAction::class);
         $group->get('/followed', Actions\Store\GetFollowedStoresAction::class);
-
         $group->delete('/unfollow', Actions\Store\UnFollowStoreAction::class);
     });
 
@@ -79,12 +51,16 @@ return function (App $app) {
     });
 
     $app->group('/api/products', function (Group $group) {
-        $group->get('/owner', Actions\Product\GetProductsForAdminAction::class);
-        $group->get('/{productId}', Actions\Product\GetProductAction::class);
-        $group->get('/owner/{productId}', Actions\Product\GetProductForAdminAction::class);
-        $group->get('', Actions\Product\GetProductsAction::class);
-        $group->post('', Actions\Product\CreateProductAction::class);
-        $group->put('/{productId}', Actions\Product\UpdateProductAction::class);
-        $group->delete('/{productId}', Actions\Product\DeleteProductAction::class);
+        $group->get('/owner', Actions\Product\Product\GetProductsForAdminAction::class);
+        $group->get('/{productId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}', Actions\Product\Product\GetProductAction::class);
+        $group->get('/owner/{productId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}', Actions\Product\Product\GetProductForAdminAction::class);
+        $group->get('', Actions\Product\Product\GetProductsAction::class);
+        $group->post('', Actions\Product\Product\CreateProductAction::class);
+        $group->put('/{productId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}/quantity', Actions\Product\Product\UpdateProductQuantityAction::class);
+        $group->put('/{productId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}', Actions\Product\Product\UpdateProductAction::class);
+        $group->delete('/{productId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}', Actions\Product\Product\DeleteProductAction::class);
+        $group->post('/variation', Actions\Product\Variation\CreateVariationAction::class);
+        $group->put('/{variationId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}/variation', Actions\Product\Variation\UpdateVariationAction::class);
+        $group->delete('/{variationId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}/variation', Actions\Product\Variation\DeleteVariationAction::class);
     });
 };

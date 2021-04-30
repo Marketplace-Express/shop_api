@@ -34,28 +34,12 @@ class Stores extends AbstractService
             ->sendSync();
     }
 
-    public function create(
-        $ownerId,
-        $name,
-        $description,
-        $type,
-        $location,
-        $photo,
-        $coverPhoto
-    ) {
+    public function create(array $data) {
         return $this->requestSender
             ->setQueueName(self::SYNC_QUEUE_NAME)
             ->setRoute('store/')
             ->setMethod('post')
-            ->setBody([
-                'ownerId' => $ownerId,
-                'name' => $name,
-                'description' => $description,
-                'type' => $type,
-                'location' => $location,
-                'photo' => $photo,
-                'coverPhoto' => $coverPhoto
-            ])
+            ->setBody($data)
             ->sendSync();
     }
 
