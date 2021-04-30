@@ -31,9 +31,13 @@ REDIS_PASSWORD=
 
 3. Build a new image:
 ```bash
+docker-compose build
+```
+
+4. Run the containers
+```bash
 docker-compose up -d
 ```
-If you run it for the first time, it will build the docker image.
 
 
 If you want to scale up the workers (sync / async), you can simply run this command:
