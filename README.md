@@ -12,7 +12,7 @@ The API Gateway for marketplace system.
 git clone git@github.com:marketplace-system/shop_api.git
 ```
 
-2- Rename the file “.env.example” under “/” to “.env” then change the parameters to match your preferences, example:
+2. Rename the file “.env.example” under “/” to “.env” then change the parameters to match your preferences, example:
 ```yaml
 #RABBITMQ CONNECTION PARAMS
 RABBITMQ_HOST=
