@@ -15,16 +15,8 @@ class ActionTest extends TestCase
     public function testActionSetsHttpCodeInRespond()
     {
         $app = $this->getAppInstance();
-        $container = $app->getContainer();
-        $logger = $container->get(LoggerInterface::class);
 
-        $testAction = new class($logger) extends Action {
-            public function __construct(
-                LoggerInterface $loggerInterface
-            ) {
-                parent::__construct($loggerInterface);
-            }
-
+        $testAction = new class extends Action {
             public function action() :Response
             {
                 return $this->respond(
@@ -38,7 +30,7 @@ class ActionTest extends TestCase
             }
         };
 
-        $app->get('/test-action-response-code', $testAction);
+        $app->get('/test-action-response-code', get_class($testAction));
         $request = $this->createRequest('GET', '/test-action-response-code');
         $response = $app->handle($request);
 
@@ -48,28 +40,22 @@ class ActionTest extends TestCase
     public function testActionSetsHttpCodeRespondData()
     {
         $app = $this->getAppInstance();
-        $container = $app->getContainer();
-        $logger = $container->get(LoggerInterface::class);
 
-        $testAction = new class($logger) extends Action {
-            public function __construct(
-                LoggerInterface $loggerInterface
-            ) {
-                parent::__construct($loggerInterface);
-            }
-
+        $testAction = new class extends Action {
             public function action() :Response
             {
                 return $this->respondWithData(
                     [
-                        'willBeDoneAt' => (new DateTimeImmutable())->format(DateTimeImmutable::ATOM)
+                        'status' => 202,
+                        'message' => [
+                            'willBeDoneAt' => (new DateTimeImmutable())->format(DateTimeImmutable::ATOM)
+                        ]
                     ],
-                    202
                 );
             }
         };
 
-        $app->get('/test-action-response-code', $testAction);
+        $app->get('/test-action-response-code', get_class($testAction));
         $request = $this->createRequest('GET', '/test-action-response-code');
         $response = $app->handle($request);
 

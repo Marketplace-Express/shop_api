@@ -1,0 +1,59 @@
+name: docker
+
+on:
+    push:
+        # publish image as master=dev or on new tag
+        # except on document and ci changes
+        branches:
+            - main
+            - development
+        tags:
+            - '*'
+        paths-ignore:
+            - '**.md'
+            - '.github/workflows/*yml'
+
+    # always run tests on merge
+    # except on document and ci changes
+    pull_request:
+        paths-ignore:
+            - '**.md'
+            - '.github/workflows/*yml'
+
+jobs:
+    unit_test:
+        runs-on: ubuntu-latest
+        if: github.event_name == 'pull_request'
+        services:
+            redis:
+                image: redis
+                ports:
+                    - 6379
+        steps:
+            - name: Get redis service ID
+              id: redis-service
+              run: echo "::set-output name=container-id::$(docker ps | grep -i redis | awk '{print $1}')"
+
+            - name: Get Github network gateway address
+              id: github-network
+              run: echo "::set-output name=gateway-address::$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.Gateway}}{{end}}' ${{ steps.redis-service.outputs.container-id }})"
+
+            - name: Create docker network
+              run: docker network create marketplace-network
+
+            - name: Check out Site Repository 📄
+              uses: actions/checkout@v2
+
+            - name: Create .env file
+              run: cp .env.example .env
+
+            - name: Replace environment variables
+              run: |
+                  sed -i 's/REDIS_HOST.*/REDIS_HOST=${{ steps.github-network.outputs.gateway-address }}/g' .env
+                  sed -i 's/MYSQL_PORT.*/MYSQL_PORT=${{ job.services.redis.ports[6379] }}/g' .env
+
+            - name: Build docker image
+              run: docker build -t marketplace_shop_api .
+
+            - name: Running unit test
+              run: docker-compose up api-unit-test

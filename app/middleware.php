@@ -5,11 +5,10 @@ use App\Application\Middleware\RequestedActionMiddleware;
 use RKA\Middleware\IpAddress;
 use Slim\App;
 
-global $container;
-
 /**
  * Middleware Order: First in, last executed
  * @param App $app
+ * @var \Psr\Container\ContainerInterface $container
  *
  */
 return function (App $app) use ($container) {

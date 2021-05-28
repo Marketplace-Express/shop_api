@@ -5,7 +5,7 @@ source ./utilities/progressbar.sh || exit 1
 
 # Define array of php & pecl extensions
 php_extensions=(intl gettext bcmath zip opcache sockets)
-pecl_extensions=(redis xdebug)
+pecl_extensions=(redis xdebug-2.9.1)
 
 
 ### START DO NOT EDIT AREA ###

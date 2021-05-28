@@ -9,10 +9,12 @@ use PHPUnit\Framework\TestCase as PHPUnit_TestCase;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
 use Slim\Factory\AppFactory;
+use Slim\Factory\ServerRequestCreatorFactory;
 use Slim\Psr7\Factory\StreamFactory;
 use Slim\Psr7\Headers;
 use Slim\Psr7\Request as SlimRequest;
 use Slim\Psr7\Uri;
+use Slim\Routing\Route;
 
 class TestCase extends PHPUnit_TestCase
 {
@@ -35,10 +37,6 @@ class TestCase extends PHPUnit_TestCase
         $dependencies = require __DIR__ . '/../app/dependencies.php';
         $dependencies($containerBuilder);
 
-        // Set up repositories
-        $repositories = require __DIR__ . '/../app/repositories.php';
-        $repositories($containerBuilder);
-
         // Build PHP-DI Container instance
         $container = $containerBuilder->build();
 
@@ -49,6 +47,7 @@ class TestCase extends PHPUnit_TestCase
         // Register middleware
         $middleware = require __DIR__ . '/../app/middleware.php';
         $middleware($app);
+        $app->addRoutingMiddleware();
 
         // Register routes
         $routes = require __DIR__ . '/../app/routes.php';
@@ -70,7 +69,7 @@ class TestCase extends PHPUnit_TestCase
         string $path,
         array $headers = ['HTTP_ACCEPT' => 'application/json'],
         array $cookies = [],
-        array $serverParams = []
+        array $serverParams = ['REMOTE_ADDR' => '10.0.0.1']
     ): Request {
         $uri = new Uri('', '', 80, $path);
         $handle = fopen('php://temp', 'w+');

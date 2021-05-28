@@ -1,7 +1,9 @@
 version: '3.3'
 services:
   api-interface:
-    image: 'registry.gitlab.com/shop_ecommerce/shop_api'
+    image: marketplace_shop_api
+    build:
+      context: .
     command: php -S 0.0.0.0:8000 -t public/
     volumes:
       - .:/src
@@ -12,10 +14,13 @@ services:
       - PHP_IDE_CONFIG=serverName=docker
 
   api-unit-test:
-    image: 'registry.gitlab.com/shop_ecommerce/shop_api'
-    command: vendor/bin/phpunit --bootstrap tests/bootstrap.php --configuration tests/phpunit.xml
+    image: marketplace_shop_api
+    command: vendor/bin/phpunit -c tests/phpunit.xml
     environment:
       - APP_ENV=test
+      - PHP_IDE_CONFIG=serverName=docker
+    env_file:
+      - .env
     volumes:
       - .:/src
       - /src/vendor

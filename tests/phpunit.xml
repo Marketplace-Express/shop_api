@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="bootstrap.php"
+         backupGlobals="false"
+         backupStaticAttributes="false"
+         verbose="true"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false">
+    <testsuite name="shop_api">
+        <directory>./</directory>
+        <exclude>../vendor</exclude>
+    </testsuite>
+    <filter>
+        <whitelist addUncoveredFilesFromWhitelist="true"
+                   processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">../app</directory>
+            <exclude>
+                <directory suffix=".php">../app</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+</phpunit>
