@@ -24,7 +24,9 @@ class Connector extends PhpRedisAdapter
         $this->redis = new \Redis();
         $this->redis->pconnect($hostname, $port);
         $this->redis->select($db);
-        $this->redis->auth($password);
+        if (!empty($password)) {
+            $this->redis->auth($password);
+        }
         return $this;
     }
 }
