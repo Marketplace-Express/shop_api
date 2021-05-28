@@ -50,7 +50,7 @@ jobs:
             - name: Replace environment variables
               run: |
                   sed -i 's/REDIS_HOST.*/REDIS_HOST=${{ steps.github-network.outputs.gateway-address }}/g' .env
-                  sed -i 's/MYSQL_PORT.*/MYSQL_PORT=${{ job.services.redis.ports[6379] }}/g' .env
+                  sed -i 's/REDIS_PORT.*/REDIS_PORT=${{ job.services.redis.ports[6379] }}/g' .env
 
             - name: Build docker image
               run: docker build -t marketplace_shop_api .
