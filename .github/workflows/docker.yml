@@ -56,4 +56,4 @@ jobs:
               run: docker build -t marketplace_shop_api .
 
             - name: Running unit test
-              run: docker-compose up api-unit-test
+              run: docker-compose run api-unit-test
