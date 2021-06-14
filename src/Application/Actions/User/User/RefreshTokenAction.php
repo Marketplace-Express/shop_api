@@ -1,27 +1,24 @@
 <?php
 /**
  * User: Wajdi Jurry
- * Date: 2020/10/04
- * Time: 13:09
+ * Date: 2021/06/13
+ * Time: 15:54
  */
 
 namespace App\Application\Actions\User\User;
 
 
 use App\Application\Actions\Action;
-use App\Application\Actions\Permissions;
-use App\Application\Chains\User\User\BanChain;
+use App\Application\Chains\User\User\RefreshTokenChain;
 use App\Utilities\RequestSenderInterface;
-use Fig\Http\Message\StatusCodeInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Log\LoggerInterface;
 
-class BanAction extends Action
+class RefreshTokenAction extends Action
 {
     /**
-     * @var BanChain
+     * @var RefreshTokenChain
      */
     private $chain;
 
@@ -31,7 +28,7 @@ class BanAction extends Action
     private $container;
 
     /**
-     * BanAction constructor.
+     * RefreshTokenAction constructor.
      * @param ContainerInterface $container
      */
     public function __construct(ContainerInterface $container)
@@ -42,28 +39,20 @@ class BanAction extends Action
     public function __invoke(Request $request, Response $response, $args): Response
     {
         $requestSender = $this->container->get(RequestSenderInterface::class);
-        $logger = $this->container->get(LoggerInterface::class);
-        $tokenAuth = $this->container->get('tokenAuth');
+        $this->chain = (new RefreshTokenChain($requestSender))->initiate();
 
-        $this->chain = (new BanChain($requestSender, $logger, $tokenAuth, $request))->initiate();
         return parent::__invoke($request, $response, $args);
     }
 
     /**
      * @return Response
-     *
-     * @Permissions(policyModel="User")
      */
     protected function action(): Response
     {
         try {
-            $this->chain->run(
-                array_merge(
-                    $this->getRequestBody(true),
-                    ['userId' => $this->request->getAttribute('userId')]
-                )
+            $response = $this->chain->run(
+                $this->getRequestBody(true)
             );
-            $response = ['status' => StatusCodeInterface::STATUS_NO_CONTENT, 'message' => null];
         } catch (\Throwable $exception) {
             $response = $this->prepareException($exception);
         }

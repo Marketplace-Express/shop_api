@@ -36,6 +36,9 @@ class CreateStore extends AbstractHandler
 
         $data['ownerId'] = $data['user']['user_id'];
 
+        // do not send extra data to stores service
+        unset($data['user']);
+
         $response = $this->requestSender->services->stores->create($data);
 
         $data['store'] = $response['message'];

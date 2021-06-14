@@ -48,7 +48,7 @@ class GetProduct extends AbstractHandler
         }
 
         $response = $this->requestSender->services->products->getProduct($data['productId'], $route);
-        $data['product'] = $product = $response['message'];
+        $data['product'] = $response['message'];
 
         if ($this->next) {
             return parent::handle($data);

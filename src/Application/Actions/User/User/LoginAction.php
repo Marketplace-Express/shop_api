@@ -22,11 +22,6 @@ class LoginAction extends Action
     protected $forceLogUsage = true;
 
     /**
-     * @var RequestSenderInterface
-     */
-    private $requestSender;
-
-    /**
      * @var LoginChain
      */
     private $chain;
@@ -38,7 +33,6 @@ class LoginAction extends Action
      */
     public function __construct(LoggerInterface $logger, RequestSenderInterface $requestSender)
     {
-        $this->requestSender = $requestSender;
         $this->chain = (new LoginChain($requestSender, $logger))->initiate();
     }
 

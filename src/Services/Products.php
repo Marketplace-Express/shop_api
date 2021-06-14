@@ -127,4 +127,29 @@ class Products extends AbstractService
             ->setMethod('delete')
             ->sendSync();
     }
+
+    public function searchProduct(string $keyword)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE_NAME)
+            ->setRoute('search')
+            ->setMethod('GET')
+            ->setQuery([
+                'keyword' => $keyword
+            ])
+            ->sendSync();
+    }
+
+    public function autocomplete(string $keyword, ?string $scope)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE_NAME)
+            ->setRoute('search/autocomplete')
+            ->setMethod('GET')
+            ->setQuery([
+                'keyword' => $keyword,
+                'scope' => $scope
+            ])
+            ->sendSync();
+    }
 }

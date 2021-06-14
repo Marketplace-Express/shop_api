@@ -66,7 +66,7 @@ class Authorize extends AbstractUserAccess
         );
 
         if (empty($isAuthorized['message'])) {
-            throw new \Exception('unauthorized', StatusCodeInterface::STATUS_UNAUTHORIZED);
+            throw new \Exception('unauthorized', StatusCodeInterface::STATUS_FORBIDDEN);
         }
 
         return parent::handle($data);

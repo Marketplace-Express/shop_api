@@ -67,8 +67,8 @@ class BanChain extends AbstractChain
         $handlers
             ->next(new IsStoreOwner($this->requestSender, $this->request->getHeaderLine('storeId')))
             ->next(new Authorize($this->requestSender, $this->request, $this->tokenAuthentication))
-            ->next(new Logger($this->logger, "user banned", ['userId', 'reason']))
-            ->next(new BanUser($this->requestSender));
+            ->next(new BanUser($this->requestSender))
+            ->next(new Logger($this->logger, "user banned", ['userId', 'reason']));
 
         $this->handlers = $handlers;
 

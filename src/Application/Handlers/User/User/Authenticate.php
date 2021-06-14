@@ -8,35 +8,10 @@
 namespace App\Application\Handlers\User\User;
 
 
-use App\Utilities\RequestSenderInterface;
 use Fig\Http\Message\StatusCodeInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Slim\Middleware\TokenAuthentication;
 
 class Authenticate extends AbstractUserAccess
 {
-    /**
-     * @var \Closure|null
-     */
-    private $callable;
-
-    /**
-     * Authenticate constructor.
-     * @param RequestSenderInterface $requestSender
-     * @param ServerRequestInterface $request
-     * @param TokenAuthentication $tokenAuthentication
-     * @param \Closure|null $callable
-     */
-    public function __construct(
-        RequestSenderInterface $requestSender,
-        ServerRequestInterface $request,
-        TokenAuthentication $tokenAuthentication,
-        \Closure $callable = null
-    ) {
-        parent::__construct($requestSender, $request, $tokenAuthentication);
-        $this->callable = $callable;
-    }
-
     public function handle(array $data = [])
     {
         $response = $this->requestSender->services->users->isAuthenticated(
@@ -49,10 +24,6 @@ class Authenticate extends AbstractUserAccess
         }
 
         $data['user'] = $response['message']['user'];
-
-        if ($this->callable) {
-            $data = call_user_func_array($this->callable, [$data]);
-        }
 
         return parent::handle($data);
     }

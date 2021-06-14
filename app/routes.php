@@ -17,6 +17,7 @@ return function (App $app) {
     $app->group('/api/users', function (Group $group) {
         $group->post('', Actions\User\User\RegisterAction::class);
         $group->post('/login', Actions\User\User\LoginAction::class);
+        $group->post('/refreshToken', Actions\User\User\RefreshTokenAction::class);
         $group->post('/ban/{userId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}', Actions\User\User\BanAction::class);
         $group->post('/unBan/{userId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}', Actions\User\User\UnBanAction::class);
         $group->get('/banned', Actions\User\User\GetBannedAction::class);
@@ -62,5 +63,7 @@ return function (App $app) {
         $group->post('/variation', Actions\Product\Variation\CreateVariationAction::class);
         $group->put('/{variationId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}/variation', Actions\Product\Variation\UpdateVariationAction::class);
         $group->delete('/{variationId:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}/variation', Actions\Product\Variation\DeleteVariationAction::class);
+        $group->get('/search/autocomplete', Actions\Product\Product\AutocompleteSearchAction::class);
+        $group->get('/search', Actions\Product\Product\SearchProductAction::class);
     });
 };

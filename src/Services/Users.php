@@ -67,6 +67,18 @@ class Users extends AbstractService
             ])->sendSync();
     }
 
+    public function refreshToken(string $refreshToken)
+    {
+        return $this->requestSender
+            ->setQueueName(self::SYNC_QUEUE_NAME)
+            ->setRoute('user/refreshToken')
+            ->setMethod('POST')
+            ->setBody([
+                'refresh_token' => $refreshToken
+            ])
+            ->sendSync();
+    }
+
     public function ban(string $userId, $reason, $description)
     {
         $this->requestSender

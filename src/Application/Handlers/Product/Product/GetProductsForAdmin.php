@@ -38,7 +38,7 @@ class GetProductsForAdmin extends AbstractHandler
         $categoryId = $data['categoryId'] ?? null;
 
         $response = $this->requestSender->services->products->getProductsForAdmin($storeId, $categoryId, $page, $limit, $sort);
-        $data['proudcts'] = $response['message'];
+        $data['products'] = $response['message'];
 
         if ($this->next) {
             return parent::handle($data);
